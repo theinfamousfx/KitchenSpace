@@ -2,8 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  compress: true,
-  poweredByHeader: false,
 };
 
 module.exports = nextConfig;
