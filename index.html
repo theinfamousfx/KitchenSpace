@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chef Virtu's Kitchen Database v3.3</title>
+  <style>
+    :root {
+      --color-primary: #21808D;
+      --color-primary-hover: #1D7480;
+      --color-primary-active: #1A6873;
+      --color-secondary: #2C3E50;
+      --color-accent: #E67E22;
+      --color-background: #f0cf92;
+      --color-surface: #FFFFFF;
+      --color-dashboard-card: #FFF9E6;
+      --color-text: #2C3E50;
+      --color-text-secondary: #7F8C8D;
+      --color-border: #BDC3C7;
+      --color-btn-primary-text: #FFFFFF;
+      --color-error: #E74C3C;
+      --color-success: #27AE60;
+      --color-warning: #F39C12;
+      --color-card-border: #E0E0E0;
+      --color-card-border-inner: #F0F0F0;
+
+      --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-size-xs: 11px;
+      --font-size-sm: 13px;
+      --font-size-base: 14px;
+      --font-size-md: 14px;
+      --font-size-lg: 16px;
+      --font-size-xl: 18px;
+      --font-size-2xl: 22px;
+      --font-size-3xl: 26px;
+      --font-size-4xl: 32px;
+      --font-weight-normal: 400;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 600;
+      --font-weight-bold: 700;
+      --line-height-tight: 1.2;
+      --line-height-normal: 1.5;
+
+      --space-4: 4px;
+      --space-6: 6px;
+      --space-8: 8px;
+      --space-10: 10px;
+      --space-12: 12px;
+      --space-16: 16px;
+      --space-20: 20px;
+      --space-24: 24px;
+      --space-32: 32px;
+
+      --radius-sm: 6px;
+      --radius-base: 8px;
+      --radius-md: 10px;
+      --radius-lg: 12px;
+      --radius-full: 9999px;
+
+      --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15);
+
+      --duration-fast: 150ms;
+      --duration-normal: 250ms;
+      --ease-standard: ease-in-out;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-family-base);
+      background-color: var(--color-background);
+      color: var(--color-text);
+      line-height: var(--line-height-normal);
+      font-size: var(--font-size-base);
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: var(--space-32) var(--space-24);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-32);
+      padding-bottom: var(--space-24);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .header h1 {
+      font-size: var(--font-size-4xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+    }
+
+    .version-badge {
+      background-color: var(--color-primary);
+      color: var(--color-btn-primary-text);
+      padding: var(--space-4) var(--space-12);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: var(--space-12);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-10) var(--space-20);
+      border-radius: var(--radius-base);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-medium);
+      cursor: pointer;
+      transition: all var(--duration-normal) var(--ease-standard);
+      border: none;
+      font-family: var(--font-family-base);
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary);
+      color: var(--color-btn-primary-text);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--color-primary-hover);
+    }
+
+    .btn-secondary {
+      background-color: var(--color-surface);
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+    }
+
+    .btn-secondary:hover {
+      background-color: #f8f8f8;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--color-border);
+      color: var(--color-text);
+    }
+
+    .btn-outline:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-danger {
+      background-color: var(--color-error);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      opacity: 0.9;
+    }
+
+    .btn-sm {
+      padding: var(--space-6) var(--space-12);
+      font-size: var(--font-size-sm);
+    }
+
+    .dashboard-section,
+    .content-section {
+      display: none;
+    }
+
+    .dashboard-section.active,
+    .content-section.active {
+      display: block;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-24);
+      padding: var(--space-20);
+      background-color: var(--color-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .section-header h2 {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-8);
+    }
+
+    .section-header p {
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-base);
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-24);
+    }
+
+    .dashboard-card {
+      background-color: var(--color-dashboard-card);
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      border-radius: var(--radius-lg);
+      padding: var(--space-24);
+      cursor: pointer;
+      transition: all var(--duration-normal) var(--ease-standard);
+      box-shadow: var(--shadow-md);
+    }
+
+    .dashboard-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--color-primary);
+    }
+
+    .dashboard-card h3 {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-semibold);
+      margin-bottom: var(--space-8);
+      color: var(--color-text);
+    }
+
+    .dashboard-card p {
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-base);
+    }
+
+    .filters-bar {
+      display: flex;
+      gap: var(--space-16);
+      margin-bottom: var(--space-24);
+      flex-wrap: wrap;
+      align-items: flex-end;
+      padding: var(--space-20);
+      background-color: var(--color-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-8);
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .filter-group label {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text);
+    }
+
+    .filter-select,
+    .search-input {
+      padding: var(--space-10) var(--space-12);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-base);
+      background-color: var(--color-surface);
+      color: var(--color-text);
+      font-size: var(--font-size-base);
+      font-family: var(--font-family-base);
+      width: 100%;
+    }
+
+    .filter-select:focus,
+    .search-input:focus {
+      outline: 2px solid var(--color-primary);
+      border-color: var(--color-primary);
+    }
+
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: var(--space-24);
+      margin-top: var(--space-24);
+    }
+
+    .item-card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-card-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all var(--duration-normal) var(--ease-standard);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+
+    .item-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .item-card:hover .item-actions {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .item-card-header {
+      padding: var(--space-20);
+    }
+
+    .item-card-title {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-semibold);
+      margin-bottom: var(--space-8);
+      color: var(--color-text);
+    }
+
+    .item-meta {
+      display: flex;
+      gap: var(--space-12);
+      margin-bottom: var(--space-12);
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: var(--space-4) var(--space-12);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      margin-bottom: var(--space-8);
+    }
+
+    .badge-primary {
+      background-color: var(--color-primary);
+      color: var(--color-btn-primary-text);
+    }
+
+    .badge-success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .badge-warning {
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+    }
+
+    .badge-danger {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .badge-info {
+      background-color: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .item-description {
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-base);
+      margin-bottom: var(--space-12);
+      line-height: 1.6;
+    }
+
+    .item-tags {
+      display: flex;
+      gap: var(--space-8);
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      background-color: rgba(33, 128, 141, 0.1);
+      color: var(--color-primary);
+      padding: var(--space-4) var(--space-10);
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-xs);
+      border: 1px solid rgba(33, 128, 141, 0.2);
+    }
+
+    .item-actions {
+      position: absolute;
+      top: var(--space-12);
+      right: var(--space-12);
+      display: flex;
+      gap: var(--space-8);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--duration-normal) var(--ease-standard);
+    }
+
+    .action-btn {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      padding: var(--space-6) var(--space-12);
+      border-radius: var(--radius-base);
+      font-size: var(--font-size-sm);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-standard);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .action-btn:hover {
+      background-color: var(--color-primary);
+      color: var(--color-btn-primary-text);
+      border-color: var(--color-primary);
+    }
+
+    .action-btn.delete:hover {
+      background-color: var(--color-error);
+      border-color: var(--color-error);
+      color: white;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.6);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-24);
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-content {
+      background-color: var(--color-surface);
+      border-radius: var(--radius-lg);
+      max-width: 800px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      animation: slideIn 0.3s ease-out;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-header {
+      padding: var(--space-24);
+      border-bottom: 1px solid var(--color-card-border-inner);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      background-color: var(--color-surface);
+      z-index: 10;
+    }
+
+    .modal-header h2 {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: var(--font-size-3xl);
+      cursor: pointer;
+      color: var(--color-text-secondary);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-base);
+      transition: all var(--duration-fast) var(--ease-standard);
+    }
+
+    .close-btn:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: var(--color-text);
+    }
+
+    .modal-body {
+      padding: var(--space-24);
+    }
+
+    .detail-section {
+      margin-bottom: var(--space-24);
+    }
+
+    .detail-section h3 {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-semibold);
+      margin-bottom: var(--space-12);
+      color: var(--color-text);
+    }
+
+    .detail-section ul,
+    .detail-section ol {
+      padding-left: var(--space-24);
+      color: var(--color-text);
+    }
+
+    .detail-section li {
+      margin-bottom: var(--space-8);
+      line-height: 1.6;
+    }
+
+    .detail-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: var(--space-16);
+      margin-bottom: var(--space-24);
+      padding: var(--space-16);
+      background-color: #F8F9FA;
+      border-radius: var(--radius-base);
+    }
+
+    .detail-meta-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .detail-meta-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-4);
+    }
+
+    .detail-meta-value {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: var(--space-12);
+      margin-top: var(--space-24);
+      padding-top: var(--space-24);
+      border-top: 1px solid var(--color-card-border-inner);
+      flex-wrap: wrap;
+    }
+
+    .form-group {
+      margin-bottom: var(--space-20);
+    }
+
+    .form-label {
+      display: block;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      margin-bottom: var(--space-8);
+      color: var(--color-text);
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: var(--space-10) var(--space-12);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-base);
+      background-color: var(--color-surface);
+      color: var(--color-text);
+      font-size: var(--font-size-base);
+      font-family: var(--font-family-base);
+    }
+
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: 2px solid var(--color-primary);
+      border-color: var(--color-primary);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-16);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: var(--space-32) var(--space-24);
+      color: var(--color-text-secondary);
+      background-color: var(--color-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .empty-state h3 {
+      font-size: var(--font-size-xl);
+      margin-bottom: var(--space-12);
+      color: var(--color-text);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .success-message {
+      background-color: var(--color-success);
+      color: white;
+      padding: var(--space-12) var(--space-20);
+      border-radius: var(--radius-base);
+      position: fixed;
+      top: var(--space-24);
+      right: var(--space-24);
+      z-index: 2000;
+      animation: slideIn 0.3s ease-out;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .tabs {
+      display: flex;
+      gap: var(--space-8);
+      margin-bottom: var(--space-24);
+      border-bottom: 2px solid var(--color-card-border);
+    }
+
+    .tab {
+      padding: var(--space-12) var(--space-20);
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-secondary);
+      transition: all var(--duration-fast) var(--ease-standard);
+    }
+
+    .tab:hover {
+      color: var(--color-text);
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .tab.active {
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: var(--space-16);
+      }
+
+      .header {
+        flex-direction: column;
+        gap: var(--space-16);
+        align-items: flex-start;
+      }
+
+      .dashboard-grid,
+      .items-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filters-bar {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 32px;">👨‍🍳</span>
+        <h1>Chef Virtu's Kitchen Database <span class="version-badge">v3.3</span></h1>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" onclick="showDashboard()">🏠 Dashboard</button>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard-section active">
+      <div class="section-header">
+        <div>
+          <h2>🏠 Welcome to Your Kitchen</h2>
+          <p>Organize recipes, SOPs, techniques, and culinary resources in one place.</p>
+        </div>
+      </div>
+      <div class="dashboard-grid">
+        <div class="dashboard-card" onclick="showSection('recipes')">
+          <h3>📖 Recipes</h3>
+          <p>Manage your recipe collection</p>
+        </div>
+        <div class="dashboard-card" onclick="showSection('sops')">
+          <h3>📋 SOPs</h3>
+          <p>Standard Operating Procedures</p>
+        </div>
+        <div class="dashboard-card" onclick="showSection('techniques')">
+          <h3>🔪 Techniques</h3>
+          <p>Culinary techniques and methods</p>
+        </div>
+        <div class="dashboard-card" onclick="showSection('notes')">
+          <h3>📝 Notes</h3>
+          <p>Quick notes and reminders</p>
+        </div>
+        <div class="dashboard-card" onclick="showSection('resources')">
+          <h3>🎬 Resources</h3>
+          <p>Videos, links, and media files</p>
+        </div>
+        <div class="dashboard-card" onclick="showSection('ebooks')">
+          <h3>📚 eBook Library</h3>
+          <p>Your digital cookbook collection</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recipes Section -->
+    <div id="recipes" class="content-section">
+      <div class="section-header">
+        <div>
+          <h2>📖 Recipe Collection</h2>
+          <p>Browse, search, and manage your recipes.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddModal('recipe')">+ Add Recipe</button>
+      </div>
+      <div class="filters-bar">
+        <div class="filter-group">
+          <label>Search</label>
+          <input type="text" id="recipeSearch" class="search-input" placeholder="Search recipes..." onkeyup="filterItems('recipe')">
+        </div>
+        <div class="filter-group">
+          <label>Cuisine</label>
+          <select id="recipeCuisine" class="filter-select" onchange="filterItems('recipe')">
+            <option value="">All Cuisines</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Difficulty</label>
+          <select id="recipeDifficulty" class="filter-select" onchange="filterItems('recipe')">
+            <option value="">All Levels</option>
+          </select>
+        </div>
+      </div>
+      <div id="recipesGrid" class="items-grid"></div>
+      <div id="recipesEmpty" class="empty-state hidden">
+        <h3>No recipes found</h3>
+        <p>Try adjusting your filters or add a new recipe.</p>
+      </div>
+    </div>
+
+    <!-- SOPs Section -->
+    <div id="sops" class="content-section">
+      <div class="section-header">
+        <div>
+          <h2>📋 Standard Operating Procedures</h2>
+          <p>Essential kitchen protocols and procedures.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddModal('sop')">+ Add SOP</button>
+      </div>
+      <div class="filters-bar">
+        <div class="filter-group">
+          <label>Search</label>
+          <input type="text" id="sopSearch" class="search-input" placeholder="Search SOPs..." onkeyup="filterItems('sop')">
+        </div>
+        <div class="filter-group">
+          <label>Category</label>
+          <select id="sopCategory" class="filter-select" onchange="filterItems('sop')">
+            <option value="">All Categories</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Priority</label>
+          <select id="sopPriority" class="filter-select" onchange="filterItems('sop')">
+            <option value="">All Priorities</option>
+          </select>
+        </div>
+      </div>
+      <div id="sopsGrid" class="items-grid"></div>
+      <div id="sopsEmpty" class="empty-state hidden">
+        <h3>No SOPs found</h3>
+        <p>Add your first standard operating procedure.</p>
+      </div>
+    </div>
+
+    <!-- Techniques Section -->
+    <div id="techniques" class="content-section">
+      <div class="section-header">
+        <div>
+          <h2>🔪 Culinary Techniques</h2>
+          <p>Master professional cooking techniques.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddModal('technique')">+ Add Technique</button>
+      </div>
+      <div class="filters-bar">
+        <div class="filter-group">
+          <label>Search</label>
+          <input type="text" id="techniqueSearch" class="search-input" placeholder="Search techniques..." onkeyup="filterItems('technique')">
+        </div>
+        <div class="filter-group">
+          <label>Category</label>
+          <select id="techniqueCategory" class="filter-select" onchange="filterItems('technique')">
+            <option value="">All Categories</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Difficulty</label>
+          <select id="techniqueDifficulty" class="filter-select" onchange="filterItems('technique')">
+            <option value="">All Levels</option>
+          </select>
+        </div>
+      </div>
+      <div id="techniquesGrid" class="items-grid"></div>
+      <div id="techniquesEmpty" class="empty-state hidden">
+        <h3>No techniques found</h3>
+        <p>Add your first cooking technique.</p>
+      </div>
+    </div>
+
+    <!-- Notes Section -->
+    <div id="notes" class="content-section">
+      <div class="section-header">
+        <div>
+          <h2>📝 Kitchen Notes</h2>
+          <p>Quick notes and important information.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddModal('note')">+ Add Note</button>
+      </div>
+      <div class="filters-bar">
+        <div class="filter-group">
+          <label>Search</label>
+          <input type="text" id="noteSearch" class="search-input" placeholder="Search notes..." onkeyup="filterItems('note')">
+        </div>
+        <div class="filter-group">
+          <label>Category</label>
+          <select id="noteCategory" class="filter-select" onchange="filterItems('note')">
+            <option value="">All Categories</option>
+          </select>
+        </div>
+      </div>
+      <div id="notesGrid" class="items-grid"></div>
+      <div id="notesEmpty" class="empty-state hidden">
+        <h3>No notes found</h3>
+        <p>Add your first note.</p>
+      </div>
+    </div>
+
+    <!-- Resources Section -->
+    <div id="resources" class="content-section">
+      <div class="section-header">
+        <div>
+          <h2>🎬 Culinary Resources</h2>
+          <p>Videos, links, and reference materials.</p>
+        </div>
+      </div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchResourceTab('videos')">Videos</button>
+        <button class="tab" onclick="switchResourceTab('links')">Links</button>
+        <button class="tab" onclick="switchResourceTab('media')">Media</button>
+      </div>
+      <div id="videosTab" class="resource-tab">
+        <button class="btn btn-primary" onclick="openAddModal('video')" style="margin-bottom: 20px;">+ Add Video</button>
+        <div id="videosGrid" class="items-grid"></div>
+        <div id="videosEmpty" class="empty-state hidden">
+          <h3>No videos found</h3>
+          <p>Add your first video resource.</p>
+        </div>
+      </div>
+      <div id="linksTab" class="resource-tab hidden">
+        <button class="btn btn-primary" onclick="openAddModal('link')" style="margin-bottom: 20px;">+ Add Link</button>
+        <div id="linksGrid" class="items-grid"></div>
+        <div id="linksEmpty" class="empty-state hidden">
+          <h3>No links found</h3>
+          <p>Add your first link resource.</p>
+        </div>
+      </div>
+      <div id="mediaTab" class="resource-tab hidden">
+        <button class="btn btn-primary" onclick="openAddModal('media')" style="margin-bottom: 20px;">+ Upload Media</button>
+        <div id="mediaGrid" class="items-grid"></div>
+        <div id="mediaEmpty" class="empty-state hidden">
+          <h3>No media found</h3>
+          <p>Add your first media file.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- eBooks Section -->
+    <div id="ebooks" class="content-section">
+      <div class="section-header">
+        <div>
+          <h2>📚 eBook Library</h2>
+          <p>Your digital cookbook collection.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddModal('ebook')">+ Add Book</button>
+      </div>
+      <div class="filters-bar">
+        <div class="filter-group">
+          <label>Search</label>
+          <input type="text" id="ebookSearch" class="search-input" placeholder="Search books..." onkeyup="filterItems('ebook')">
+        </div>
+        <div class="filter-group">
+          <label>Cuisine</label>
+          <select id="ebookCuisine" class="filter-select" onchange="filterItems('ebook')">
+            <option value="">All Cuisines</option>
+          </select>
+        </div>
+      </div>
+      <div id="ebooksGrid" class="items-grid"></div>
+      <div id="ebooksEmpty" class="empty-state hidden">
+        <h3>No books found</h3>
+        <p>Add your first eBook.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Universal Modal -->
+  <div id="itemModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Item Details</h2>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="modalContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
