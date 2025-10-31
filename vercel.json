@@ -1,0 +1,7 @@
+{
+  "buildCommand": "next build",
+  "outputDirectory": ".next",
+  "env": {
+    "NEXT_PUBLIC_APP_URL": "https://your-app-url.vercel.app"
+  }
+}
