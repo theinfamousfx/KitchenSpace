@@ -133,11 +133,17 @@ export default function KitchenDatabase() {
         }
       } else {
         newData[actualType].push({
-          id: nextIds[actualType as keyof typeof nextIds],
-          ...formData,
-          createdat: new Date().toISOString().split('T')[0],
-          updatedat: new Date().toISOString().split('T')[0],
-        });
+  id: nextIds[actualType as keyof typeof nextIds],
+  title: formData.title || '',
+  category: formData.category || '',
+  priority: formData.priority || '',
+  description: formData.description || '',
+  steps: formData.steps || '',
+  compliancenotes: formData.compliancenotes || '',
+  ...formData,
+  createdat: new Date().toISOString().split('T')[0],
+  updatedat: new Date().toISOString().split('T')[0],
+});
 
         setNextIds((prev) => ({
           ...prev,
