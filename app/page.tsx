@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import '../styles/kitchen.css';
+import '../kitchen.css';
 
 // Type definitions for different item types
 type SOP = {
