@@ -1,40 +1,3 @@
-// ============================================================================
-// Kitchen Database - Frontend Application (COMPLETE v2)
-// Connected to PostgreSQL via Next.js API routes
-// Full CRUD with Enhanced Recipe Fields
-// ============================================================================
-
-const API_BASE = '/api';
-
-let data = {
-  recipes: [],
-  sops: [],
-  techniques: [],
-  notes: [],
-  resource_videos: [],
-  resource_links: [],
-  resource_media: [],
-  cookbooks: [],
-};
-
-let currentView = 'recipes';
-let currentEditingId = null;
-
-// ============================================================================
-// API Fetch Functions
-// ============================================================================
-
-async function fetchFromAPI(endpoint) {
-  try {
-    const response = await fetch(`${API_BASE}${endpoint}`);
-    if (!response.ok) throw new Error(`API error: ${response.status}`);
-    return await response.json();
-  } catch (error) {
-    console.error(`Failed to fetch from ${endpoint}:`, error);
-    return [];
-  }
-}
-
 async function postToAPI(endpoint, payload) {
   try {
     const response = await fetch(`${API_BASE}${endpoint}`, {
@@ -129,7 +92,7 @@ function renderCurrentView() {
 }
 
 // ============================================================================
-// Render Functions
+// Render Functions - RECIPES
 // ============================================================================
 
 function renderRecipes() {
@@ -191,6 +154,10 @@ function renderRecipes() {
   `;
 }
 
+// ============================================================================
+// Render Functions - SOPs (ENHANCED)
+// ============================================================================
+
 function renderSOPs() {
   const container = document.getElementById('content');
   if (!container) return;
@@ -214,11 +181,16 @@ function renderSOPs() {
     <div class="items-grid">
       ${data.sops.map(sop => `
         <div class="item-card">
-          <h3>${sop.title || 'Untitled'}</h3>
-          <p class="meta">${sop.category || 'General'} • ${sop.status || 'Active'}</p>
-          <p class="description">${sop.description || 'No description'}</p>
+          <h3>${sop.title_page || 'Untitled SOP'}</h3>
+          <p class="meta">Standard Operating Procedure</p>
+          <p class="description">${sop.purpose || 'No purpose defined'}</p>
+          
+          ${sop.scope ? `<p style="font-size: 13px; color: #7a8a99; margin: 8px 0;"><strong>Scope:</strong> ${sop.scope.substring(0, 80)}${sop.scope.length > 80 ? '...' : ''}</p>` : ''}
+          
+          ${sop.equipment ? `<p style="font-size: 13px; color: #7a8a99; margin: 8px 0;"><strong>Equipment Listed:</strong> Yes</p>` : ''}
+          
           <div class="card-footer">
-            <span class="badge">${sop.frequency || 'Regular'}</span>
+            <span class="badge">SOP</span>
             <div style="display: flex; gap: 8px;">
               <button class="btn-edit" onclick="editSOP(${sop.id})">Edit</button>
               <button class="btn-delete" onclick="deleteSOP(${sop.id})">Delete</button>
@@ -229,6 +201,10 @@ function renderSOPs() {
     </div>
   `;
 }
+
+// ============================================================================
+// Render Functions - OTHER SECTIONS
+// ============================================================================
 
 function renderTechniques() {
   const container = document.getElementById('content');
@@ -465,7 +441,7 @@ function renderCookbooks() {
 }
 
 // ============================================================================
-// Modal Functions - RECIPES (WITH ENHANCED FIELDS)
+// Modal Functions - RECIPES
 // ============================================================================
 
 function openRecipeModal(id = null) {
@@ -506,11 +482,11 @@ function openRecipeModal(id = null) {
             <input type="number" placeholder="Cook Time (minutes)" value="${recipe.cook_time_minutes || ''}" min="0">
           </div>
 
-          <textarea placeholder="Ingredients (one per line)&#10;e.g. 2 cups flour, 1 egg, 1 cup milk" style="min-height: 120px;">${recipe.ingredients || ''}</textarea>
+          <textarea placeholder="Ingredients (one per line)" style="min-height: 120px;">${recipe.ingredients || ''}</textarea>
 
           <textarea placeholder="Method / Instructions (step by step)" style="min-height: 120px;">${recipe.instructions || ''}</textarea>
 
-          <textarea placeholder="Serving Suggestions (e.g., Serve hot with rice, Garnish with herbs)" style="min-height: 100px;">${recipe.serving_suggestions || ''}</textarea>
+          <textarea placeholder="Serving Suggestions" style="min-height: 100px;">${recipe.serving_suggestions || ''}</textarea>
 
           <textarea placeholder="Tags (comma-separated: Classic, Indian-Inspired, Vegetarian)" style="min-height: 80px;">${tagsDisplay}</textarea>
 
@@ -525,7 +501,7 @@ function openRecipeModal(id = null) {
 }
 
 // ============================================================================
-// Modal Functions - OTHER SECTIONS
+// Modal Functions - SOPs (ENHANCED WITH 7 FIELDS)
 // ============================================================================
 
 function openSOPModal(id = null) {
@@ -534,22 +510,37 @@ function openSOPModal(id = null) {
   
   const modal = `
     <div class="modal-overlay" onclick="closeModal(event)">
-      <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal modal-large" onclick="event.stopPropagation()">
         <span class="modal-close" onclick="closeModal()">×</span>
         <h2>${id ? 'Edit SOP' : 'Add SOP'}</h2>
         <form onsubmit="saveSOP(event)">
-          <input type="text" placeholder="SOP Title" value="${sop.title || ''}" required>
-          <textarea placeholder="Description">${sop.description || ''}</textarea>
-          <input type="text" placeholder="Category" value="${sop.category || ''}">
-          <textarea placeholder="Steps">${sop.steps || ''}</textarea>
-          <textarea placeholder="Safety Notes">${sop.safety_notes || ''}</textarea>
-          <button type="submit">${id ? 'Update' : 'Create'} SOP</button>
+          <input type="text" placeholder="Title Page / SOP Title *" value="${sop.title_page || ''}" required>
+          
+          <textarea placeholder="Purpose (Why this SOP exists and what it accomplishes)" style="min-height: 100px;">${sop.purpose || ''}</textarea>
+          
+          <textarea placeholder="Scope (Who, what, where, when this SOP applies to)" style="min-height: 100px;">${sop.scope || ''}</textarea>
+          
+          <textarea placeholder="Definitions and Terminology (Abbreviations, technical terms, key definitions)" style="min-height: 100px;">${sop.definitions_terminology || ''}</textarea>
+          
+          <textarea placeholder="Equipment (Tools, materials, and equipment needed)" style="min-height: 100px;">${sop.equipment || ''}</textarea>
+          
+          <textarea placeholder="Procedure Steps - Main Actions (Detailed step-by-step procedures)" style="min-height: 150px;">${sop.procedure_steps || ''}</textarea>
+          
+          <textarea placeholder="Notes and Clarifications (Important notes, tips, warnings)" style="min-height: 100px;">${sop.notes_clarifications || ''}</textarea>
+          
+          <textarea placeholder="Related Documents & References (Links to other docs, appendices)" style="min-height: 100px;">${sop.related_documents_references || ''}</textarea>
+          
+          <button type="submit" style="margin-top: 20px;">${id ? 'Update' : 'Create'} SOP</button>
         </form>
       </div>
     </div>
   `;
   document.body.insertAdjacentHTML('beforeend', modal);
 }
+
+// ============================================================================
+// Modal Functions - OTHER SECTIONS
+// ============================================================================
 
 function openTechniqueModal(id = null) {
   currentEditingId = id;
@@ -705,7 +696,7 @@ function closeModal(event) {
 }
 
 // ============================================================================
-// Save Functions
+// Save Functions - RECIPES
 // ============================================================================
 
 async function saveRecipe(event) {
@@ -744,17 +735,24 @@ async function saveRecipe(event) {
   await loadAllData();
 }
 
+// ============================================================================
+// Save Functions - SOPs (ENHANCED WITH 7 FIELDS)
+// ============================================================================
+
 async function saveSOP(event) {
   event.preventDefault();
   const form = event.target;
   const inputs = form.querySelectorAll('input, textarea');
   
   const sop = {
-    title: inputs[0].value,
-    description: inputs[1].value,
-    category: inputs[2].value,
-    steps: inputs[3].value,
-    safety_notes: inputs[4].value,
+    title_page: inputs[0].value,
+    purpose: inputs[1].value,
+    scope: inputs[2].value,
+    definitions_terminology: inputs[3].value,
+    equipment: inputs[4].value,
+    procedure_steps: inputs[5].value,
+    notes_clarifications: inputs[6].value,
+    related_documents_references: inputs[7].value,
   };
 
   if (currentEditingId) {
@@ -767,6 +765,10 @@ async function saveSOP(event) {
   closeModal();
   await loadAllData();
 }
+
+// ============================================================================
+// Save Functions - OTHER SECTIONS
+// ============================================================================
 
 async function saveTechnique(event) {
   event.preventDefault();
@@ -1027,6 +1029,6 @@ window.saveCookbook = saveCookbook;
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('Kitchen Database App Loaded');
+  console.log('Kitchen Database App v3 Loaded');
   loadAllData();
 });
