@@ -1,6 +1,6 @@
 // ============================================================================
-// Chef Virtu Kitchen Database - COMPLETE WITH WORKING DASHBOARD & SECTIONS
-// Dashboard with hover effects + All 8 sections clickable
+// REPLACE public/app.js WITH THIS FILE
+// Complete app with modal dialog forms working
 // ============================================================================
 
 let data = {
@@ -45,6 +45,18 @@ let data = {
 };
 
 let currentView = 'dashboard';
+let nextIds = {
+  recipes: 2,
+  sops: 2,
+  techniques: 1,
+  notes: 1,
+  videos: 1,
+  links: 1,
+  media: 1,
+  cookbooks: 1,
+};
+
+let editingItem = null;
 
 // ============================================================================
 // DASHBOARD RENDERING
@@ -123,12 +135,17 @@ function renderDashboard() {
 }
 
 // ============================================================================
-// SECTION RENDERING
+// NAVIGATION & VIEW SWITCHING
 // ============================================================================
 
 function switchView(view) {
   console.log('✅ Switching to view:', view);
   currentView = view;
+  
+  // Update active tab
+  document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+  event.target.classList.add('active');
+  
   renderCurrentView();
 }
 
@@ -148,6 +165,10 @@ function renderCurrentView() {
     default: renderDashboard();
   }
 }
+
+// ============================================================================
+// RENDER SECTIONS
+// ============================================================================
 
 function renderRecipes() {
   const content = document.getElementById('content');
@@ -176,7 +197,6 @@ function renderRecipes() {
     html += `</div>`;
   }
 
-  html += `<div style="margin-top: 20px;"><button class="btn-back" onclick="switchView('dashboard')">← Back to Dashboard</button></div>`;
   content.innerHTML = html;
 }
 
@@ -207,7 +227,6 @@ function renderSOPs() {
     html += `</div>`;
   }
 
-  html += `<div style="margin-top: 20px;"><button class="btn-back" onclick="switchView('dashboard')">← Back to Dashboard</button></div>`;
   content.innerHTML = html;
 }
 
@@ -238,7 +257,6 @@ function renderTechniques() {
     html += `</div>`;
   }
 
-  html += `<div style="margin-top: 20px;"><button class="btn-back" onclick="switchView('dashboard')">← Back to Dashboard</button></div>`;
   content.innerHTML = html;
 }
 
@@ -269,7 +287,6 @@ function renderNotes() {
     html += `</div>`;
   }
 
-  html += `<div style="margin-top: 20px;"><button class="btn-back" onclick="switchView('dashboard')">← Back to Dashboard</button></div>`;
   content.innerHTML = html;
 }
 
@@ -300,7 +317,6 @@ function renderVideos() {
     html += `</div>`;
   }
 
-  html += `<div style="margin-top: 20px;"><button class="btn-back" onclick="switchView('dashboard')">← Back to Dashboard</button></div>`;
   content.innerHTML = html;
 }
 
@@ -331,7 +347,6 @@ function renderLinks() {
     html += `</div>`;
   }
 
-  html += `<div style="margin-top: 20px;"><button class="btn-back" onclick="switchView('dashboard')">← Back to Dashboard</button></div>`;
   content.innerHTML = html;
 }
 
@@ -362,7 +377,6 @@ function renderMedia() {
     html += `</div>`;
   }
 
-  html += `<div style="margin-top: 20px;"><button class="btn-back" onclick="switchView('dashboard')">← Back to Dashboard</button></div>`;
   content.innerHTML = html;
 }
 
@@ -393,30 +407,16 @@ function renderCookbooks() {
     html += `</div>`;
   }
 
-  html += `<div style="margin-top: 20px;"><button class="btn-back" onclick="switchView('dashboard')">← Back to Dashboard</button></div>`;
   content.innerHTML = html;
 }
 
 // ============================================================================
-// FORM HANDLING
+// MODAL FORM FUNCTIONS
 // ============================================================================
-
-let nextIds = {
-  recipes: 2,
-  sops: 2,
-  techniques: 1,
-  notes: 1,
-  videos: 1,
-  links: 1,
-  media: 1,
-  cookbooks: 1,
-};
-
-let editingItem = null;
 
 function openAddForm(type) {
   editingItem = null;
-  showForm(type);
+  showFormModal(type);
 }
 
 function editItem(type, id) {
@@ -426,16 +426,13 @@ function editItem(type, id) {
   if (!item) return;
   
   editingItem = { type: actualType, id };
-  showForm(type, item);
+  showFormModal(type, item);
 }
 
-function showForm(type, item = null) {
-  const content = document.getElementById('content');
+function showFormModal(type, item = null) {
   const isEdit = item !== null;
   
-  let formHtml = `<div class="form-container">`;
-  formHtml += `<h2>${isEdit ? 'Edit' : 'Add'} ${type.charAt(0).toUpperCase() + type.slice(1)}</h2>`;
-  formHtml += `<form onsubmit="saveItem(event, '${type}')">`;
+  let formHtml = `<form onsubmit="saveItem(event, '${type}')">`;
 
   if (type === 'recipe') {
     formHtml += `
@@ -524,12 +521,36 @@ function showForm(type, item = null) {
   formHtml += `
     <div class="form-actions">
       <button type="submit" class="btn-save">Save</button>
-      <button type="button" class="btn-cancel" onclick="switchView('${currentView}')">Cancel</button>
+      <button type="button" class="btn-cancel" onclick="closeFormModal()">Cancel</button>
     </div>
-  </form>
-  </div>`;
+  </form>`;
 
-  content.innerHTML = formHtml;
+  let modalHtml = `
+    <div id="formModal" class="modal-overlay" onclick="if(event.target === this) closeFormModal()">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>${isEdit ? 'Edit' : 'Add'} ${type.charAt(0).toUpperCase() + type.slice(1)}</h2>
+          <button class="modal-close" onclick="closeFormModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          ${formHtml}
+        </div>
+      </div>
+    </div>
+  `;
+
+  const existingModal = document.getElementById('formModal');
+  if (existingModal) existingModal.remove();
+
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function closeFormModal() {
+  const modal = document.getElementById('formModal');
+  if (modal) {
+    modal.style.opacity = '0';
+    setTimeout(() => modal.remove(), 300);
+  }
 }
 
 function saveItem(event, type) {
@@ -554,7 +575,8 @@ function saveItem(event, type) {
   }
 
   console.log('✅ Item saved!');
-  switchView(currentView);
+  closeFormModal();
+  renderCurrentView();
 }
 
 function deleteItem(section, id) {
@@ -568,7 +590,7 @@ function deleteItem(section, id) {
 // INITIALIZATION
 // ============================================================================
 
-console.log('✅ Kitchen Database READY - All sections working!');
+console.log('✅ Kitchen Database READY - All sections working with modals!');
 renderDashboard();
 
 // Global exports
@@ -577,3 +599,4 @@ window.openAddForm = openAddForm;
 window.editItem = editItem;
 window.saveItem = saveItem;
 window.deleteItem = deleteItem;
+window.closeFormModal = closeFormModal;
