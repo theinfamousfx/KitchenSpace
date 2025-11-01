@@ -1,15 +1,43 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
+  const [appLoaded, setAppLoaded] = useState(false);
+
   useEffect(() => {
+    // Define switchView on window before loading app.js
+    (window as any).switchView = (view: string) => {
+      console.log('Switching to view:', view);
+      const content = document.getElementById('content');
+      if (content) {
+        // Call the app.js switchView function if it exists
+        if (typeof (window as any).switchView === 'function') {
+          (window as any).switchView(view);
+        }
+      }
+    };
+
     // Dynamically load the app.js script
     const script = document.createElement('script');
     script.src = '/app.js';
     script.async = true;
+    script.onload = () => {
+      setAppLoaded(true);
+      console.log('app.js loaded');
+    };
     document.body.appendChild(script);
+
+    return () => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
   }, []);
+
+  const handleNavClick = (view: string) => {
+    (window as any).switchView(view);
+  };
 
   return (
     <>
@@ -41,7 +69,7 @@ export default function Home() {
       >
         <button
           className="nav-btn"
-          onClick={() => window.switchView('recipes')}
+          onClick={() => handleNavClick('recipes')}
           style={{
             padding: '10px 15px',
             border: '1px solid #ccc',
@@ -54,7 +82,7 @@ export default function Home() {
         </button>
         <button
           className="nav-btn"
-          onClick={() => window.switchView('sops')}
+          onClick={() => handleNavClick('sops')}
           style={{
             padding: '10px 15px',
             border: '1px solid #ccc',
@@ -67,7 +95,7 @@ export default function Home() {
         </button>
         <button
           className="nav-btn"
-          onClick={() => window.switchView('techniques')}
+          onClick={() => handleNavClick('techniques')}
           style={{
             padding: '10px 15px',
             border: '1px solid #ccc',
@@ -80,7 +108,7 @@ export default function Home() {
         </button>
         <button
           className="nav-btn"
-          onClick={() => window.switchView('notes')}
+          onClick={() => handleNavClick('notes')}
           style={{
             padding: '10px 15px',
             border: '1px solid #ccc',
@@ -93,7 +121,7 @@ export default function Home() {
         </button>
         <button
           className="nav-btn"
-          onClick={() => window.switchView('videos')}
+          onClick={() => handleNavClick('videos')}
           style={{
             padding: '10px 15px',
             border: '1px solid #ccc',
@@ -106,7 +134,7 @@ export default function Home() {
         </button>
         <button
           className="nav-btn"
-          onClick={() => window.switchView('links')}
+          onClick={() => handleNavClick('links')}
           style={{
             padding: '10px 15px',
             border: '1px solid #ccc',
@@ -119,7 +147,7 @@ export default function Home() {
         </button>
         <button
           className="nav-btn"
-          onClick={() => window.switchView('media')}
+          onClick={() => handleNavClick('media')}
           style={{
             padding: '10px 15px',
             border: '1px solid #ccc',
@@ -132,7 +160,7 @@ export default function Home() {
         </button>
         <button
           className="nav-btn"
-          onClick={() => window.switchView('cookbooks')}
+          onClick={() => handleNavClick('cookbooks')}
           style={{
             padding: '10px 15px',
             border: '1px solid #ccc',
@@ -167,7 +195,7 @@ export default function Home() {
                 borderRadius: '8px',
                 cursor: 'pointer',
               }}
-              onClick={() => window.switchView('recipes')}
+              onClick={() => handleNavClick('recipes')}
             >
               <h3 style={{ marginBottom: '8px' }}>📖 Recipes</h3>
               <p style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>Recipe collection with search and filters</p>
@@ -183,7 +211,7 @@ export default function Home() {
                 borderRadius: '8px',
                 cursor: 'pointer',
               }}
-              onClick={() => window.switchView('sops')}
+              onClick={() => handleNavClick('sops')}
             >
               <h3 style={{ marginBottom: '8px' }}>📋 SOPs</h3>
               <p style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>Standard Operating Procedures</p>
@@ -199,7 +227,7 @@ export default function Home() {
                 borderRadius: '8px',
                 cursor: 'pointer',
               }}
-              onClick={() => window.switchView('techniques')}
+              onClick={() => handleNavClick('techniques')}
             >
               <h3 style={{ marginBottom: '8px' }}>🎯 Techniques</h3>
               <p style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>Culinary techniques library</p>
@@ -215,7 +243,7 @@ export default function Home() {
                 borderRadius: '8px',
                 cursor: 'pointer',
               }}
-              onClick={() => window.switchView('notes')}
+              onClick={() => handleNavClick('notes')}
             >
               <h3 style={{ marginBottom: '8px' }}>📝 Notes</h3>
               <p style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>Quick notes and culinary journal</p>
@@ -231,7 +259,7 @@ export default function Home() {
                 borderRadius: '8px',
                 cursor: 'pointer',
               }}
-              onClick={() => window.switchView('videos')}
+              onClick={() => handleNavClick('videos')}
             >
               <h3 style={{ marginBottom: '8px' }}>🎥 Resources</h3>
               <p style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>Videos, links, and media library</p>
@@ -247,7 +275,7 @@ export default function Home() {
                 borderRadius: '8px',
                 cursor: 'pointer',
               }}
-              onClick={() => window.switchView('cookbooks')}
+              onClick={() => handleNavClick('cookbooks')}
             >
               <h3 style={{ marginBottom: '8px' }}>📚 Cookbooks</h3>
               <p style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>Your digital cookbook collection</p>
