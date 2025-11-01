@@ -1,10 +1,17 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from "next";
 
-
+// Separate metadata
 export const metadata: Metadata = {
-  title: 'Chef Virtu Kitchen Database',
-  description: 'Professional kitchen database and management system for chefs',
-  viewport: 'width=device-width, initial-scale=1',
+  title: "Kitchen Database",
+  description: "Professional culinary management system",
+};
+
+// Separate viewport export
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: '#2c3e50',
 };
 
 export default function RootLayout({
@@ -16,13 +23,12 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <meta charSet="UTF-8" />
-        <meta name="version" content="2.1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>{`
+          // ... your CSS here
+        `}</style>
       </head>
-      <body>
-        <div id="root">
-          {children}
-        </div>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
