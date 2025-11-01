@@ -17,9 +17,11 @@ export default function Home() {
   }, []);
 
   const handleSectionClick = (view: string) => {
-    console.log('Clicking section:', view);
+    console.log('Clicking view:', view);
     if (typeof (window as any).switchView === 'function') {
       (window as any).switchView(view);
+    } else {
+      console.error('switchView function not found');
     }
   };
 
@@ -36,7 +38,7 @@ export default function Home() {
         </header>
 
         <nav className="app-nav" id="navigation">
-          <button className="nav-btn active" onClick={() => handleSectionClick('recipes')}>📖 Recipes</button>
+          <button className="nav-btn" onClick={() => handleSectionClick('recipes')}>📖 Recipes</button>
           <button className="nav-btn" onClick={() => handleSectionClick('sops')}>📋 SOPs</button>
           <button className="nav-btn" onClick={() => handleSectionClick('techniques')}>🎯 Techniques</button>
           <button className="nav-btn" onClick={() => handleSectionClick('notes')}>📝 Notes</button>
