@@ -98,42 +98,36 @@ export default function Home() {
                 <div className="card-icon">📖</div>
                 <h3 className="card-title">Recipes</h3>
                 <p className="card-description">Recipe collection with search and filters</p>
-                <button className="card-btn">Browse, search, and manage your recipes.</button>
               </div>
 
               <div className="card" onClick={() => handleSectionClick('sops')}>
                 <div className="card-icon">📋</div>
                 <h3 className="card-title">SOPs</h3>
                 <p className="card-description">Standard Operating Procedures</p>
-                <button className="card-btn">Essential kitchen protocols and procedures.</button>
               </div>
 
               <div className="card" onClick={() => handleSectionClick('techniques')}>
                 <div className="card-icon">🎯</div>
                 <h3 className="card-title">Techniques</h3>
                 <p className="card-description">Culinary techniques library</p>
-                <button className="card-btn">Master professional cooking techniques.</button>
               </div>
 
               <div className="card" onClick={() => handleSectionClick('notes')}>
                 <div className="card-icon">📝</div>
                 <h3 className="card-title">Notes</h3>
                 <p className="card-description">Quick notes and culinary journal</p>
-                <button className="card-btn">Quick notes and important information.</button>
               </div>
 
               <div className="card" onClick={() => handleSectionClick('videos')}>
                 <div className="card-icon">🎬</div>
                 <h3 className="card-title">Resources</h3>
                 <p className="card-description">Videos, links, and media library</p>
-                <button className="card-btn">Videos, links, and reference materials.</button>
               </div>
 
               <div className="card" onClick={() => handleSectionClick('cookbooks')}>
                 <div className="card-icon">📚</div>
                 <h3 className="card-title">Cookbooks</h3>
                 <p className="card-description">Your digital cookbook collection</p>
-                <button className="card-btn">Your digital cookbook collection.</button>
               </div>
             </div>
           </section>

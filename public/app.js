@@ -1,12 +1,11 @@
 // ============================================================================
-// Kitchen Database - Frontend Application
-// Updated to fetch from PostgreSQL via Next.js API routes
+// Kitchen Database - Frontend Application (UPDATED)
+// Connected to PostgreSQL via Next.js API routes
+// Full CRUD functionality with database integration
 // ============================================================================
 
-// API Configuration
 const API_BASE = '/api';
 
-// Data Storage - Now loads from API instead of hardcoded
 let data = {
   recipes: [],
   sops: [],
@@ -18,7 +17,6 @@ let data = {
   cookbooks: [],
 };
 
-// Current view state
 let currentView = 'recipes';
 let currentEditingId = null;
 
@@ -33,6 +31,7 @@ async function fetchFromAPI(endpoint) {
     return await response.json();
   } catch (error) {
     console.error(`Failed to fetch from ${endpoint}:`, error);
+    alert('Error loading data. Please check your connection.');
     return [];
   }
 }
@@ -45,9 +44,12 @@ async function postToAPI(endpoint, payload) {
       body: JSON.stringify(payload),
     });
     if (!response.ok) throw new Error(`API error: ${response.status}`);
-    return await response.json();
+    const result = await response.json();
+    alert('Item created successfully!');
+    return result;
   } catch (error) {
     console.error(`Failed to POST to ${endpoint}:`, error);
+    alert('Error creating item. Please try again.');
     return null;
   }
 }
@@ -60,9 +62,12 @@ async function putToAPI(endpoint, payload) {
       body: JSON.stringify(payload),
     });
     if (!response.ok) throw new Error(`API error: ${response.status}`);
-    return await response.json();
+    const result = await response.json();
+    alert('Item updated successfully!');
+    return result;
   } catch (error) {
     console.error(`Failed to PUT to ${endpoint}:`, error);
+    alert('Error updating item. Please try again.');
     return null;
   }
 }
@@ -73,15 +78,17 @@ async function deleteFromAPI(endpoint) {
       method: 'DELETE',
     });
     if (!response.ok) throw new Error(`API error: ${response.status}`);
+    alert('Item deleted successfully!');
     return await response.json();
   } catch (error) {
     console.error(`Failed to DELETE from ${endpoint}:`, error);
+    alert('Error deleting item. Please try again.');
     return null;
   }
 }
 
 // ============================================================================
-// Data Loading Functions
+// Data Loading
 // ============================================================================
 
 async function loadAllData() {
@@ -99,14 +106,13 @@ async function loadAllData() {
 }
 
 // ============================================================================
-// UI Navigation Functions
+// Navigation
 // ============================================================================
 
 function switchView(view) {
   currentView = view;
   renderCurrentView();
   
-  // Update active button
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.classList.remove('active');
   });
@@ -115,45 +121,37 @@ function switchView(view) {
 
 function renderCurrentView() {
   const container = document.getElementById('content');
+  if (!container) return;
   
   switch(currentView) {
-    case 'recipes':
-      renderRecipes();
-      break;
-    case 'sops':
-      renderSOPs();
-      break;
-    case 'techniques':
-      renderTechniques();
-      break;
-    case 'notes':
-      renderNotes();
-      break;
-    case 'videos':
-      renderVideos();
-      break;
-    case 'links':
-      renderLinks();
-      break;
-    case 'media':
-      renderMedia();
-      break;
-    case 'cookbooks':
-      renderCookbooks();
-      break;
-    default:
-      renderRecipes();
+    case 'recipes': renderRecipes(); break;
+    case 'sops': renderSOPs(); break;
+    case 'techniques': renderTechniques(); break;
+    case 'notes': renderNotes(); break;
+    case 'videos': renderVideos(); break;
+    case 'links': renderLinks(); break;
+    case 'media': renderMedia(); break;
+    case 'cookbooks': renderCookbooks(); break;
+    default: renderRecipes();
   }
 }
 
 // ============================================================================
-// Render Functions for Each Section
+// Render Functions
 // ============================================================================
 
 function renderRecipes() {
   const container = document.getElementById('content');
+  if (!container) return;
+
   if (data.recipes.length === 0) {
-    container.innerHTML = '<p class="empty-message">No recipes found. Click "Add Recipe" to create one.</p>';
+    container.innerHTML = `
+      <div class="section-header">
+        <h2>Recipes</h2>
+        <button class="btn-add" onclick="openRecipeModal()">+ Add Recipe</button>
+      </div>
+      <p class="empty-message">No recipes found. Click "Add Recipe" to create one.</p>
+    `;
     return;
   }
 
@@ -164,13 +162,16 @@ function renderRecipes() {
     </div>
     <div class="items-grid">
       ${data.recipes.map(recipe => `
-        <div class="item-card" onclick="editRecipe(${recipe.id})">
-          <h3>${recipe.title}</h3>
+        <div class="item-card">
+          <h3>${recipe.title || 'Untitled'}</h3>
           <p class="meta">${recipe.cuisine || 'Unknown'} • ${recipe.difficulty_level || 'N/A'}</p>
           <p class="description">${recipe.description || 'No description'}</p>
           <div class="card-footer">
-            <span class="badge">${recipe.yield_amount} ${recipe.yield_unit}</span>
-            <button class="btn-delete" onclick="deleteRecipe(${recipe.id}, event)">Delete</button>
+            <span class="badge">${recipe.yield_amount || 'N/A'} ${recipe.yield_unit || ''}</span>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-edit" onclick="editRecipe(${recipe.id})">Edit</button>
+              <button class="btn-delete" onclick="deleteRecipe(${recipe.id})">Delete</button>
+            </div>
           </div>
         </div>
       `).join('')}
@@ -180,8 +181,16 @@ function renderRecipes() {
 
 function renderSOPs() {
   const container = document.getElementById('content');
+  if (!container) return;
+
   if (data.sops.length === 0) {
-    container.innerHTML = '<p class="empty-message">No SOPs found. Click "Add SOP" to create one.</p>';
+    container.innerHTML = `
+      <div class="section-header">
+        <h2>Standard Operating Procedures</h2>
+        <button class="btn-add" onclick="openSOPModal()">+ Add SOP</button>
+      </div>
+      <p class="empty-message">No SOPs found. Click "Add SOP" to create one.</p>
+    `;
     return;
   }
 
@@ -192,13 +201,16 @@ function renderSOPs() {
     </div>
     <div class="items-grid">
       ${data.sops.map(sop => `
-        <div class="item-card" onclick="editSOP(${sop.id})">
-          <h3>${sop.title}</h3>
+        <div class="item-card">
+          <h3>${sop.title || 'Untitled'}</h3>
           <p class="meta">${sop.category || 'General'} • ${sop.status || 'Active'}</p>
           <p class="description">${sop.description || 'No description'}</p>
           <div class="card-footer">
             <span class="badge">${sop.frequency || 'Regular'}</span>
-            <button class="btn-delete" onclick="deleteSOP(${sop.id}, event)">Delete</button>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-edit" onclick="editSOP(${sop.id})">Edit</button>
+              <button class="btn-delete" onclick="deleteSOP(${sop.id})">Delete</button>
+            </div>
           </div>
         </div>
       `).join('')}
@@ -208,8 +220,16 @@ function renderSOPs() {
 
 function renderTechniques() {
   const container = document.getElementById('content');
+  if (!container) return;
+
   if (data.techniques.length === 0) {
-    container.innerHTML = '<p class="empty-message">No techniques found. Click "Add Technique" to create one.</p>';
+    container.innerHTML = `
+      <div class="section-header">
+        <h2>Techniques</h2>
+        <button class="btn-add" onclick="openTechniqueModal()">+ Add Technique</button>
+      </div>
+      <p class="empty-message">No techniques found. Click "Add Technique" to create one.</p>
+    `;
     return;
   }
 
@@ -220,13 +240,16 @@ function renderTechniques() {
     </div>
     <div class="items-grid">
       ${data.techniques.map(tech => `
-        <div class="item-card" onclick="editTechnique(${tech.id})">
-          <h3>${tech.title}</h3>
+        <div class="item-card">
+          <h3>${tech.title || 'Untitled'}</h3>
           <p class="meta">${tech.category || 'General'} • ${tech.difficulty_level || 'N/A'}</p>
           <p class="description">${tech.description || 'No description'}</p>
           <div class="card-footer">
             <span class="badge">${tech.estimated_practice_time_hours || 'N/A'} hours</span>
-            <button class="btn-delete" onclick="deleteTechnique(${tech.id}, event)">Delete</button>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-edit" onclick="editTechnique(${tech.id})">Edit</button>
+              <button class="btn-delete" onclick="deleteTechnique(${tech.id})">Delete</button>
+            </div>
           </div>
         </div>
       `).join('')}
@@ -236,8 +259,16 @@ function renderTechniques() {
 
 function renderNotes() {
   const container = document.getElementById('content');
+  if (!container) return;
+
   if (data.notes.length === 0) {
-    container.innerHTML = '<p class="empty-message">No notes found. Click "Add Note" to create one.</p>';
+    container.innerHTML = `
+      <div class="section-header">
+        <h2>Notes</h2>
+        <button class="btn-add" onclick="openNoteModal()">+ Add Note</button>
+      </div>
+      <p class="empty-message">No notes found. Click "Add Note" to create one.</p>
+    `;
     return;
   }
 
@@ -248,13 +279,16 @@ function renderNotes() {
     </div>
     <div class="items-grid">
       ${data.notes.map(note => `
-        <div class="item-card" onclick="editNote(${note.id})">
+        <div class="item-card">
           <h3>${note.title || 'Untitled'}</h3>
           <p class="meta">${note.note_type || 'General'} • ${note.category || 'Uncategorized'}</p>
           <p class="description">${note.content || 'No content'}</p>
           <div class="card-footer">
-            ${note.is_pinned ? '<span class="badge pinned">📌 Pinned</span>' : ''}
-            <button class="btn-delete" onclick="deleteNote(${note.id}, event)">Delete</button>
+            <span class="badge">${note.is_pinned ? '📌 Pinned' : 'Note'}</span>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-edit" onclick="editNote(${note.id})">Edit</button>
+              <button class="btn-delete" onclick="deleteNote(${note.id})">Delete</button>
+            </div>
           </div>
         </div>
       `).join('')}
@@ -264,8 +298,16 @@ function renderNotes() {
 
 function renderVideos() {
   const container = document.getElementById('content');
+  if (!container) return;
+
   if (data.resource_videos.length === 0) {
-    container.innerHTML = '<p class="empty-message">No videos found. Click "Add Video" to create one.</p>';
+    container.innerHTML = `
+      <div class="section-header">
+        <h2>Video Resources</h2>
+        <button class="btn-add" onclick="openVideoModal()">+ Add Video</button>
+      </div>
+      <p class="empty-message">No videos found. Click "Add Video" to create one.</p>
+    `;
     return;
   }
 
@@ -276,13 +318,16 @@ function renderVideos() {
     </div>
     <div class="items-grid">
       ${data.resource_videos.map(video => `
-        <div class="item-card" onclick="editVideo(${video.id})">
-          <h3>${video.title}</h3>
+        <div class="item-card">
+          <h3>${video.title || 'Untitled'}</h3>
           <p class="meta">${video.platform || 'Unknown'} • ${video.channel_name || 'Unknown'}</p>
           <p class="description">${video.description || 'No description'}</p>
           <div class="card-footer">
             <span class="badge">${video.duration_minutes || 'N/A'} min</span>
-            <button class="btn-delete" onclick="deleteVideo(${video.id}, event)">Delete</button>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-edit" onclick="editVideo(${video.id})">Edit</button>
+              <button class="btn-delete" onclick="deleteVideo(${video.id})">Delete</button>
+            </div>
           </div>
         </div>
       `).join('')}
@@ -292,8 +337,16 @@ function renderVideos() {
 
 function renderLinks() {
   const container = document.getElementById('content');
+  if (!container) return;
+
   if (data.resource_links.length === 0) {
-    container.innerHTML = '<p class="empty-message">No links found. Click "Add Link" to create one.</p>';
+    container.innerHTML = `
+      <div class="section-header">
+        <h2>Resource Links</h2>
+        <button class="btn-add" onclick="openLinkModal()">+ Add Link</button>
+      </div>
+      <p class="empty-message">No links found. Click "Add Link" to create one.</p>
+    `;
     return;
   }
 
@@ -304,12 +357,16 @@ function renderLinks() {
     </div>
     <div class="items-grid">
       ${data.resource_links.map(link => `
-        <div class="item-card" onclick="window.open('${link.url}', '_blank')">
-          <h3>${link.title}</h3>
+        <div class="item-card">
+          <h3>${link.title || 'Untitled'}</h3>
           <p class="meta">${link.source_website || 'Unknown'}</p>
           <p class="description">${link.description || 'No description'}</p>
           <div class="card-footer">
-            <button class="btn-delete" onclick="deleteLink(${link.id}, event)">Delete</button>
+            <a href="${link.url}" target="_blank" class="badge" style="text-decoration: none;">Open Link ↗</a>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-edit" onclick="editLink(${link.id})">Edit</button>
+              <button class="btn-delete" onclick="deleteLink(${link.id})">Delete</button>
+            </div>
           </div>
         </div>
       `).join('')}
@@ -319,8 +376,16 @@ function renderLinks() {
 
 function renderMedia() {
   const container = document.getElementById('content');
+  if (!container) return;
+
   if (data.resource_media.length === 0) {
-    container.innerHTML = '<p class="empty-message">No media found. Click "Add Media" to create one.</p>';
+    container.innerHTML = `
+      <div class="section-header">
+        <h2>Media Files</h2>
+        <button class="btn-add" onclick="openMediaModal()">+ Add Media</button>
+      </div>
+      <p class="empty-message">No media found. Click "Add Media" to create one.</p>
+    `;
     return;
   }
 
@@ -331,13 +396,16 @@ function renderMedia() {
     </div>
     <div class="items-grid">
       ${data.resource_media.map(media => `
-        <div class="item-card" onclick="editMedia(${media.id})">
-          <h3>${media.filename}</h3>
+        <div class="item-card">
+          <h3>${media.filename || 'Untitled'}</h3>
           <p class="meta">${media.media_type || 'Unknown'} • ${media.storage_location || 'Unknown'}</p>
           <p class="description">${media.description || 'No description'}</p>
           <div class="card-footer">
             <span class="badge">${media.file_size_kb || 'N/A'} KB</span>
-            <button class="btn-delete" onclick="deleteMedia(${media.id}, event)">Delete</button>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-edit" onclick="editMedia(${media.id})">Edit</button>
+              <button class="btn-delete" onclick="deleteMedia(${media.id})">Delete</button>
+            </div>
           </div>
         </div>
       `).join('')}
@@ -347,8 +415,16 @@ function renderMedia() {
 
 function renderCookbooks() {
   const container = document.getElementById('content');
+  if (!container) return;
+
   if (data.cookbooks.length === 0) {
-    container.innerHTML = '<p class="empty-message">No cookbooks found. Click "Add Cookbook" to create one.</p>';
+    container.innerHTML = `
+      <div class="section-header">
+        <h2>Cookbooks</h2>
+        <button class="btn-add" onclick="openCookbookModal()">+ Add Cookbook</button>
+      </div>
+      <p class="empty-message">No cookbooks found. Click "Add Cookbook" to create one.</p>
+    `;
     return;
   }
 
@@ -359,13 +435,16 @@ function renderCookbooks() {
     </div>
     <div class="items-grid">
       ${data.cookbooks.map(book => `
-        <div class="item-card" onclick="editCookbook(${book.id})">
-          <h3>${book.title}</h3>
+        <div class="item-card">
+          <h3>${book.title || 'Untitled'}</h3>
           <p class="meta">${book.author || 'Unknown'} • ${book.publication_year || 'N/A'}</p>
           <p class="description">${book.description || 'No description'}</p>
           <div class="card-footer">
             <span class="badge">${book.format || 'Unknown'}</span>
-            <button class="btn-delete" onclick="deleteCookbook(${book.id}, event)">Delete</button>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-edit" onclick="editCookbook(${book.id})">Edit</button>
+              <button class="btn-delete" onclick="deleteCookbook(${book.id})">Delete</button>
+            </div>
           </div>
         </div>
       `).join('')}
@@ -390,12 +469,15 @@ function openRecipeModal(id = null) {
           <input type="text" placeholder="Recipe Title" value="${recipe.title || ''}" required>
           <textarea placeholder="Description">${recipe.description || ''}</textarea>
           <input type="text" placeholder="Cuisine" value="${recipe.cuisine || ''}">
-          <input type="text" placeholder="Difficulty Level" value="${recipe.difficulty_level || ''}">
+          <select>
+            <option value="">Select Difficulty</option>
+            <option value="Beginner" ${recipe.difficulty_level === 'Beginner' ? 'selected' : ''}>Beginner</option>
+            <option value="Intermediate" ${recipe.difficulty_level === 'Intermediate' ? 'selected' : ''}>Intermediate</option>
+            <option value="Advanced" ${recipe.difficulty_level === 'Advanced' ? 'selected' : ''}>Advanced</option>
+          </select>
           <input type="number" placeholder="Prep Time (minutes)" value="${recipe.prep_time_minutes || ''}">
           <input type="number" placeholder="Cook Time (minutes)" value="${recipe.cook_time_minutes || ''}">
           <textarea placeholder="Instructions">${recipe.instructions || ''}</textarea>
-          <input type="checkbox" id="is_favorite" ${recipe.is_favorite ? 'checked' : ''}>
-          <label for="is_favorite">Favorite</label>
           <button type="submit">${id ? 'Update' : 'Create'} Recipe</button>
         </form>
       </div>
@@ -440,9 +522,15 @@ function openTechniqueModal(id = null) {
           <input type="text" placeholder="Technique Title" value="${tech.title || ''}" required>
           <textarea placeholder="Description">${tech.description || ''}</textarea>
           <input type="text" placeholder="Category" value="${tech.category || ''}">
-          <input type="text" placeholder="Difficulty Level" value="${tech.difficulty_level || ''}">
+          <select>
+            <option value="">Select Difficulty</option>
+            <option value="Beginner" ${tech.difficulty_level === 'Beginner' ? 'selected' : ''}>Beginner</option>
+            <option value="Intermediate" ${tech.difficulty_level === 'Intermediate' ? 'selected' : ''}>Intermediate</option>
+            <option value="Advanced" ${tech.difficulty_level === 'Advanced' ? 'selected' : ''}>Advanced</option>
+          </select>
           <textarea placeholder="Step by Step">${tech.step_by_step || ''}</textarea>
           <textarea placeholder="Common Mistakes">${tech.common_mistakes || ''}</textarea>
+          <textarea placeholder="Best Practices">${tech.best_practices || ''}</textarea>
           <button type="submit">${id ? 'Update' : 'Create'} Technique</button>
         </form>
       </div>
@@ -464,8 +552,6 @@ function openNoteModal(id = null) {
           <input type="text" placeholder="Note Title" value="${note.title || ''}">
           <textarea placeholder="Content" required>${note.content || ''}</textarea>
           <input type="text" placeholder="Category" value="${note.category || ''}">
-          <input type="checkbox" id="is_pinned" ${note.is_pinned ? 'checked' : ''}>
-          <label for="is_pinned">Pin this note</label>
           <button type="submit">${id ? 'Update' : 'Create'} Note</button>
         </form>
       </div>
@@ -530,7 +616,13 @@ function openMediaModal(id = null) {
         <h2>${id ? 'Edit Media' : 'Add Media'}</h2>
         <form onsubmit="saveMedia(event)">
           <input type="text" placeholder="Filename" value="${media.filename || ''}" required>
-          <input type="text" placeholder="Media Type" value="${media.media_type || ''}">
+          <select>
+            <option value="">Select Media Type</option>
+            <option value="Image" ${media.media_type === 'Image' ? 'selected' : ''}>Image</option>
+            <option value="PDF" ${media.media_type === 'PDF' ? 'selected' : ''}>PDF</option>
+            <option value="Document" ${media.media_type === 'Document' ? 'selected' : ''}>Document</option>
+            <option value="Video" ${media.media_type === 'Video' ? 'selected' : ''}>Video</option>
+          </select>
           <textarea placeholder="Description">${media.description || ''}</textarea>
           <button type="submit">${id ? 'Update' : 'Create'} Media</button>
         </form>
@@ -571,23 +663,22 @@ function closeModal(event) {
 }
 
 // ============================================================================
-// Save Functions - Submit to API
+// Save Functions
 // ============================================================================
 
 async function saveRecipe(event) {
   event.preventDefault();
   const form = event.target;
-  const formData = new FormData(form);
+  const inputs = form.querySelectorAll('input, textarea, select');
   
   const recipe = {
-    title: form.querySelector('input[placeholder="Recipe Title"]').value,
-    description: form.querySelector('textarea[placeholder="Description"]').value,
-    cuisine: form.querySelector('input[placeholder="Cuisine"]').value,
-    difficulty_level: form.querySelector('input[placeholder="Difficulty Level"]').value,
-    prep_time_minutes: parseInt(form.querySelector('input[placeholder="Prep Time (minutes)"]').value) || 0,
-    cook_time_minutes: parseInt(form.querySelector('input[placeholder="Cook Time (minutes)"]').value) || 0,
-    instructions: form.querySelector('textarea[placeholder="Instructions"]').value,
-    is_favorite: form.querySelector('#is_favorite').checked,
+    title: inputs[0].value,
+    description: inputs[1].value,
+    cuisine: inputs[2].value,
+    difficulty_level: inputs[3].value,
+    prep_time_minutes: parseInt(inputs[4].value) || 0,
+    cook_time_minutes: parseInt(inputs[5].value) || 0,
+    instructions: inputs[6].value,
   };
 
   if (currentEditingId) {
@@ -604,13 +695,14 @@ async function saveRecipe(event) {
 async function saveSOP(event) {
   event.preventDefault();
   const form = event.target;
+  const inputs = form.querySelectorAll('input, textarea');
   
   const sop = {
-    title: form.querySelector('input[placeholder="SOP Title"]').value,
-    description: form.querySelector('textarea[placeholder="Description"]').value,
-    category: form.querySelector('input[placeholder="Category"]').value,
-    steps: form.querySelector('textarea[placeholder="Steps"]').value,
-    safety_notes: form.querySelector('textarea[placeholder="Safety Notes"]').value,
+    title: inputs[0].value,
+    description: inputs[1].value,
+    category: inputs[2].value,
+    steps: inputs[3].value,
+    safety_notes: inputs[4].value,
   };
 
   if (currentEditingId) {
@@ -627,14 +719,16 @@ async function saveSOP(event) {
 async function saveTechnique(event) {
   event.preventDefault();
   const form = event.target;
+  const inputs = form.querySelectorAll('input, textarea, select');
   
   const technique = {
-    title: form.querySelector('input[placeholder="Technique Title"]').value,
-    description: form.querySelector('textarea[placeholder="Description"]').value,
-    category: form.querySelector('input[placeholder="Category"]').value,
-    difficulty_level: form.querySelector('input[placeholder="Difficulty Level"]').value,
-    step_by_step: form.querySelector('textarea[placeholder="Step by Step"]').value,
-    common_mistakes: form.querySelector('textarea[placeholder="Common Mistakes"]').value,
+    title: inputs[0].value,
+    description: inputs[1].value,
+    category: inputs[2].value,
+    difficulty_level: inputs[3].value,
+    step_by_step: inputs[4].value,
+    common_mistakes: inputs[5].value,
+    best_practices: inputs[6].value,
   };
 
   if (currentEditingId) {
@@ -651,12 +745,12 @@ async function saveTechnique(event) {
 async function saveNote(event) {
   event.preventDefault();
   const form = event.target;
+  const inputs = form.querySelectorAll('input, textarea');
   
   const note = {
-    title: form.querySelector('input[placeholder="Note Title"]').value,
-    content: form.querySelector('textarea[placeholder="Content"]').value,
-    category: form.querySelector('input[placeholder="Category"]').value,
-    is_pinned: form.querySelector('#is_pinned').checked,
+    title: inputs[0].value,
+    content: inputs[1].value,
+    category: inputs[2].value,
   };
 
   if (currentEditingId) {
@@ -673,13 +767,14 @@ async function saveNote(event) {
 async function saveVideo(event) {
   event.preventDefault();
   const form = event.target;
+  const inputs = form.querySelectorAll('input, textarea');
   
   const video = {
-    title: form.querySelector('input[placeholder="Video Title"]').value,
-    url: form.querySelector('input[placeholder="Video URL"]').value,
-    platform: form.querySelector('input[placeholder="Platform (YouTube, Vimeo, etc)"]').value,
-    channel_name: form.querySelector('input[placeholder="Channel Name"]').value,
-    description: form.querySelector('textarea[placeholder="Description"]').value,
+    title: inputs[0].value,
+    url: inputs[1].value,
+    platform: inputs[2].value,
+    channel_name: inputs[3].value,
+    description: inputs[4].value,
   };
 
   if (currentEditingId) {
@@ -696,12 +791,13 @@ async function saveVideo(event) {
 async function saveLink(event) {
   event.preventDefault();
   const form = event.target;
+  const inputs = form.querySelectorAll('input, textarea');
   
   const link = {
-    title: form.querySelector('input[placeholder="Link Title"]').value,
-    url: form.querySelector('input[placeholder="URL"]').value,
-    description: form.querySelector('textarea[placeholder="Description"]').value,
-    source_website: form.querySelector('input[placeholder="Website"]').value,
+    title: inputs[0].value,
+    url: inputs[1].value,
+    description: inputs[2].value,
+    source_website: inputs[3].value,
   };
 
   if (currentEditingId) {
@@ -718,11 +814,12 @@ async function saveLink(event) {
 async function saveMedia(event) {
   event.preventDefault();
   const form = event.target;
+  const inputs = form.querySelectorAll('input, textarea, select');
   
   const media = {
-    filename: form.querySelector('input[placeholder="Filename"]').value,
-    media_type: form.querySelector('input[placeholder="Media Type"]').value,
-    description: form.querySelector('textarea[placeholder="Description"]').value,
+    filename: inputs[0].value,
+    media_type: inputs[1].value,
+    description: inputs[2].value,
   };
 
   if (currentEditingId) {
@@ -739,14 +836,15 @@ async function saveMedia(event) {
 async function saveCookbook(event) {
   event.preventDefault();
   const form = event.target;
+  const inputs = form.querySelectorAll('input, textarea');
   
   const cookbook = {
-    title: form.querySelector('input[placeholder="Cookbook Title"]').value,
-    author: form.querySelector('input[placeholder="Author"]').value,
-    isbn: form.querySelector('input[placeholder="ISBN"]').value,
-    publication_year: parseInt(form.querySelector('input[placeholder="Publication Year"]').value) || null,
-    description: form.querySelector('textarea[placeholder="Description"]').value,
-    cuisine_type: form.querySelector('input[placeholder="Cuisine Type"]').value,
+    title: inputs[0].value,
+    author: inputs[1].value,
+    isbn: inputs[2].value,
+    publication_year: parseInt(inputs[3].value) || null,
+    description: inputs[4].value,
+    cuisine_type: inputs[5].value,
   };
 
   if (currentEditingId) {
@@ -764,64 +862,56 @@ async function saveCookbook(event) {
 // Delete Functions
 // ============================================================================
 
-async function deleteRecipe(id, event) {
-  event.stopPropagation();
+async function deleteRecipe(id) {
   if (confirm('Delete this recipe?')) {
     await deleteFromAPI(`/recipes?id=${id}`);
     await loadAllData();
   }
 }
 
-async function deleteSOP(id, event) {
-  event.stopPropagation();
+async function deleteSOP(id) {
   if (confirm('Delete this SOP?')) {
     await deleteFromAPI(`/sops?id=${id}`);
     await loadAllData();
   }
 }
 
-async function deleteTechnique(id, event) {
-  event.stopPropagation();
+async function deleteTechnique(id) {
   if (confirm('Delete this technique?')) {
     await deleteFromAPI(`/techniques?id=${id}`);
     await loadAllData();
   }
 }
 
-async function deleteNote(id, event) {
-  event.stopPropagation();
+async function deleteNote(id) {
   if (confirm('Delete this note?')) {
     await deleteFromAPI(`/notes?id=${id}`);
     await loadAllData();
   }
 }
 
-async function deleteVideo(id, event) {
-  event.stopPropagation();
+async function deleteVideo(id) {
   if (confirm('Delete this video?')) {
     await deleteFromAPI(`/resource-videos?id=${id}`);
     await loadAllData();
   }
 }
 
-async function deleteLink(id, event) {
-  event.stopPropagation();
+async function deleteLink(id) {
   if (confirm('Delete this link?')) {
     await deleteFromAPI(`/resource-links?id=${id}`);
     await loadAllData();
   }
 }
 
-async function deleteMedia(id, event) {
-  event.stopPropagation();
+async function deleteMedia(id) {
   if (confirm('Delete this media?')) {
     await deleteFromAPI(`/resource-media?id=${id}`);
     await loadAllData();
   }
 }
 
-async function deleteCookbook(id, event) {
-  event.stopPropagation();
+async function deleteCookbook(id) {
   if (confirm('Delete this cookbook?')) {
     await deleteFromAPI(`/cookbooks?id=${id}`);
     await loadAllData();
@@ -832,39 +922,56 @@ async function deleteCookbook(id, event) {
 // Edit Functions
 // ============================================================================
 
-function editRecipe(id) {
-  openRecipeModal(id);
-}
-
-function editSOP(id) {
-  openSOPModal(id);
-}
-
-function editTechnique(id) {
-  openTechniqueModal(id);
-}
-
-function editNote(id) {
-  openNoteModal(id);
-}
-
-function editVideo(id) {
-  openVideoModal(id);
-}
-
-function editMedia(id) {
-  openMediaModal(id);
-}
-
-function editCookbook(id) {
-  openCookbookModal(id);
-}
+function editRecipe(id) { openRecipeModal(id); }
+function editSOP(id) { openSOPModal(id); }
+function editTechnique(id) { openTechniqueModal(id); }
+function editNote(id) { openNoteModal(id); }
+function editVideo(id) { openVideoModal(id); }
+function editLink(id) { openLinkModal(id); }
+function editMedia(id) { openMediaModal(id); }
+function editCookbook(id) { openCookbookModal(id); }
 
 // ============================================================================
 // Initialization
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('App initialized. Loading data...');
+  console.log('App initialized');
   loadAllData();
 });
+
+// Make functions global so they can be called from HTML
+window.switchView = switchView;
+window.openRecipeModal = openRecipeModal;
+window.openSOPModal = openSOPModal;
+window.openTechniqueModal = openTechniqueModal;
+window.openNoteModal = openNoteModal;
+window.openVideoModal = openVideoModal;
+window.openLinkModal = openLinkModal;
+window.openMediaModal = openMediaModal;
+window.openCookbookModal = openCookbookModal;
+window.closeModal = closeModal;
+window.editRecipe = editRecipe;
+window.editSOP = editSOP;
+window.editTechnique = editTechnique;
+window.editNote = editNote;
+window.editVideo = editVideo;
+window.editLink = editLink;
+window.editMedia = editMedia;
+window.editCookbook = editCookbook;
+window.deleteRecipe = deleteRecipe;
+window.deleteSOP = deleteSOP;
+window.deleteTechnique = deleteTechnique;
+window.deleteNote = deleteNote;
+window.deleteVideo = deleteVideo;
+window.deleteLink = deleteLink;
+window.deleteMedia = deleteMedia;
+window.deleteCookbook = deleteCookbook;
+window.saveRecipe = saveRecipe;
+window.saveSOP = saveSOP;
+window.saveTechnique = saveTechnique;
+window.saveNote = saveNote;
+window.saveVideo = saveVideo;
+window.saveLink = saveLink;
+window.saveMedia = saveMedia;
+window.saveCookbook = saveCookbook;
