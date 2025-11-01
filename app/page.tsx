@@ -132,18 +132,40 @@ export default function KitchenDatabase() {
           };
         }
       } else {
-        newData[actualType].push({
-  id: nextIds[actualType as keyof typeof nextIds],
-  title: formData.title || '',
-  category: formData.category || '',
-  priority: formData.priority || '',
-  description: formData.description || '',
-  steps: formData.steps || '',
-  compliancenotes: formData.compliancenotes || '',
-  ...formData,
-  createdat: new Date().toISOString().split('T')[0],
-  updatedat: new Date().toISOString().split('T')[0],
-});
+        if (actualType === 'SOPs') {
+  newData.SOPs.push({
+    id: nextIds.SOPs,
+    title: formData.title || '',
+    category: formData.category || '',
+    priority: formData.priority || '',
+    description: formData.description || '',
+    steps: formData.steps || '',
+    compliancenotes: formData.compliancenotes || '',
+    createdat: new Date().toISOString().split('T')[0],
+    updatedat: new Date().toISOString().split('T')[0],
+  })
+} else if (actualType === 'Recipes') {
+  newData.Recipes.push({
+    id: nextIds.Recipes,
+    title: formData.title || '',
+    cuisine: formData.cuisine || '',
+    difficulty: formData.difficulty || 'Medium',
+    servings: formData.servings ? parseInt(formData.servings) : 1,
+    preptime: formData.preptime ? parseInt(formData.preptime) : 0,
+    cooktime: formData.cooktime ? parseInt(formData.cooktime) : 0,
+    description: formData.description || '',
+    ingredients: formData.ingredients || '',
+    instructions: formData.instructions || '',
+    createdat: new Date().toISOString().split('T')[0],
+    updatedat: new Date().toISOString().split('T')[0],
+  })
+} else if (actualType === 'Techniques') {
+  // Handle Techniques with their own fields
+  newData.Techniques.push({
+    // ... add Technique-specific fields
+  })
+}
+;
 
         setNextIds((prev) => ({
           ...prev,
