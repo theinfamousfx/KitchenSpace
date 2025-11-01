@@ -1,3 +1,40 @@
+// ============================================================================
+// Kitchen Database - Fresh Complete Application (PRODUCTION READY)
+// All Features Included: Recipes, SOPs, Techniques, Notes, Videos, Links, Media, Cookbooks
+// Full CRUD with Professional Forms
+// ============================================================================
+
+const API_BASE = '/api';
+
+let data = {
+  recipes: [],
+  sops: [],
+  techniques: [],
+  notes: [],
+  resource_videos: [],
+  resource_links: [],
+  resource_media: [],
+  cookbooks: [],
+};
+
+let currentView = 'recipes';
+let currentEditingId = null;
+
+// ============================================================================
+// API Functions
+// ============================================================================
+
+async function fetchFromAPI(endpoint) {
+  try {
+    const response = await fetch(`${API_BASE}${endpoint}`);
+    if (!response.ok) throw new Error(`API error: ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    console.error(`Fetch error:`, error);
+    return [];
+  }
+}
+
 async function postToAPI(endpoint, payload) {
   try {
     const response = await fetch(`${API_BASE}${endpoint}`, {
@@ -8,7 +45,7 @@ async function postToAPI(endpoint, payload) {
     if (!response.ok) throw new Error(`API error: ${response.status}`);
     return await response.json();
   } catch (error) {
-    console.error(`Failed to POST to ${endpoint}:`, error);
+    console.error(`Post error:`, error);
     return null;
   }
 }
@@ -23,30 +60,28 @@ async function putToAPI(endpoint, payload) {
     if (!response.ok) throw new Error(`API error: ${response.status}`);
     return await response.json();
   } catch (error) {
-    console.error(`Failed to PUT to ${endpoint}:`, error);
+    console.error(`Put error:`, error);
     return null;
   }
 }
 
 async function deleteFromAPI(endpoint) {
   try {
-    const response = await fetch(`${API_BASE}${endpoint}`, {
-      method: 'DELETE',
-    });
+    const response = await fetch(`${API_BASE}${endpoint}`, { method: 'DELETE' });
     if (!response.ok) throw new Error(`API error: ${response.status}`);
     return await response.json();
   } catch (error) {
-    console.error(`Failed to DELETE from ${endpoint}:`, error);
+    console.error(`Delete error:`, error);
     return null;
   }
 }
 
 // ============================================================================
-// Data Loading
+// Load Data
 // ============================================================================
 
 async function loadAllData() {
-  console.log('Loading data from API...');
+  console.log('🔄 Loading data from API...');
   data.recipes = await fetchFromAPI('/recipes');
   data.sops = await fetchFromAPI('/sops');
   data.techniques = await fetchFromAPI('/techniques');
@@ -55,6 +90,7 @@ async function loadAllData() {
   data.resource_links = await fetchFromAPI('/resource-links');
   data.resource_media = await fetchFromAPI('/resource-media');
   data.cookbooks = await fetchFromAPI('/cookbooks');
+  console.log('✅ Data loaded');
   renderCurrentView();
 }
 
@@ -64,20 +100,12 @@ async function loadAllData() {
 
 function switchView(view) {
   currentView = view;
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  if (event && event.target) event.target.classList.add('active');
   renderCurrentView();
-  
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.classList.remove('active');
-  });
-  if (event && event.target) {
-    event.target.classList.add('active');
-  }
 }
 
 function renderCurrentView() {
-  const container = document.getElementById('content');
-  if (!container) return;
-  
   switch(currentView) {
     case 'recipes': renderRecipes(); break;
     case 'sops': renderSOPs(); break;
@@ -92,7 +120,7 @@ function renderCurrentView() {
 }
 
 // ============================================================================
-// Render Functions - RECIPES
+// RENDER: Recipes
 // ============================================================================
 
 function renderRecipes() {
@@ -105,7 +133,7 @@ function renderRecipes() {
         <h2>Recipes</h2>
         <button class="btn-add" onclick="openRecipeModal()">+ Add Recipe</button>
       </div>
-      <p class="empty-message">No recipes found. Click "Add Recipe" to create one.</p>
+      <p class="empty-message">No recipes yet. Create your first recipe!</p>
     `;
     return;
   }
@@ -116,36 +144,17 @@ function renderRecipes() {
       <button class="btn-add" onclick="openRecipeModal()">+ Add Recipe</button>
     </div>
     <div class="items-grid">
-      ${data.recipes.map(recipe => `
+      ${data.recipes.map(r => `
         <div class="item-card">
-          <h3>${recipe.title || 'Untitled'}</h3>
-          <p class="meta">
-            ${recipe.cuisine || 'Unknown'} • 
-            ${recipe.category || 'Uncategorized'} • 
-            ${recipe.difficulty_level || 'N/A'}
-          </p>
-          <p class="description">${recipe.description || 'No description'}</p>
-          
-          ${recipe.yield_amount ? `<p style="font-size: 13px; color: #7a8a99; margin: 8px 0;"><strong>Yields:</strong> ${recipe.yield_amount} ${recipe.yield_unit || 'servings'}</p>` : ''}
-          
-          ${recipe.prep_time_minutes || recipe.cook_time_minutes ? `
-            <p style="font-size: 13px; color: #7a8a99; margin: 8px 0;">
-              <strong>Time:</strong> 
-              ${recipe.prep_time_minutes ? `Prep ${recipe.prep_time_minutes}min` : ''} 
-              ${recipe.cook_time_minutes ? `Cook ${recipe.cook_time_minutes}min` : ''}
-            </p>
-          ` : ''}
-          
-          ${recipe.tags && recipe.tags.length > 0 ? `
-            <div style="margin: 12px 0; display: flex; flex-wrap: wrap; gap: 6px;">
-              ${recipe.tags.map(tag => `<span class="badge">${tag}</span>`).join('')}
-            </div>
-          ` : ''}
-          
+          <h3>${r.title || 'Untitled'}</h3>
+          <p class="meta">${r.cuisine || 'Unknown'} • ${r.category || 'General'} • ${r.difficulty_level || 'N/A'}</p>
+          <p class="description">${r.description || 'No description'}</p>
+          ${r.yield_amount ? `<p style="font-size: 13px; color: #7a8a99; margin: 8px 0;"><strong>Yields:</strong> ${r.yield_amount} ${r.yield_unit || 'servings'}</p>` : ''}
+          ${r.tags && r.tags.length ? `<div style="margin: 12px 0; display: flex; flex-wrap: wrap; gap: 6px;">${r.tags.map(t => `<span class="badge">${t}</span>`).join('')}</div>` : ''}
           <div class="card-footer">
             <div style="display: flex; gap: 8px;">
-              <button class="btn-edit" onclick="editRecipe(${recipe.id})">Edit</button>
-              <button class="btn-delete" onclick="deleteRecipe(${recipe.id})">Delete</button>
+              <button class="btn-edit" onclick="editRecipe(${r.id})">Edit</button>
+              <button class="btn-delete" onclick="deleteRecipe(${r.id})">Delete</button>
             </div>
           </div>
         </div>
@@ -155,7 +164,7 @@ function renderRecipes() {
 }
 
 // ============================================================================
-// Render Functions - SOPs (ENHANCED)
+// RENDER: SOPs
 // ============================================================================
 
 function renderSOPs() {
@@ -168,7 +177,7 @@ function renderSOPs() {
         <h2>Standard Operating Procedures</h2>
         <button class="btn-add" onclick="openSOPModal()">+ Add SOP</button>
       </div>
-      <p class="empty-message">No SOPs found. Click "Add SOP" to create one.</p>
+      <p class="empty-message">No SOPs yet. Create your first SOP!</p>
     `;
     return;
   }
@@ -179,21 +188,17 @@ function renderSOPs() {
       <button class="btn-add" onclick="openSOPModal()">+ Add SOP</button>
     </div>
     <div class="items-grid">
-      ${data.sops.map(sop => `
+      ${data.sops.map(s => `
         <div class="item-card">
-          <h3>${sop.title_page || 'Untitled SOP'}</h3>
+          <h3>${s.title_page || 'Untitled SOP'}</h3>
           <p class="meta">Standard Operating Procedure</p>
-          <p class="description">${sop.purpose || 'No purpose defined'}</p>
-          
-          ${sop.scope ? `<p style="font-size: 13px; color: #7a8a99; margin: 8px 0;"><strong>Scope:</strong> ${sop.scope.substring(0, 80)}${sop.scope.length > 80 ? '...' : ''}</p>` : ''}
-          
-          ${sop.equipment ? `<p style="font-size: 13px; color: #7a8a99; margin: 8px 0;"><strong>Equipment Listed:</strong> Yes</p>` : ''}
-          
+          <p class="description">${s.purpose || 'No purpose defined'}</p>
+          ${s.scope ? `<p style="font-size: 13px; color: #7a8a99; margin: 8px 0;"><strong>Scope:</strong> ${s.scope.substring(0, 80)}${s.scope.length > 80 ? '...' : ''}</p>` : ''}
           <div class="card-footer">
             <span class="badge">SOP</span>
             <div style="display: flex; gap: 8px;">
-              <button class="btn-edit" onclick="editSOP(${sop.id})">Edit</button>
-              <button class="btn-delete" onclick="deleteSOP(${sop.id})">Delete</button>
+              <button class="btn-edit" onclick="editSOP(${s.id})">Edit</button>
+              <button class="btn-delete" onclick="deleteSOP(${s.id})">Delete</button>
             </div>
           </div>
         </div>
@@ -203,7 +208,7 @@ function renderSOPs() {
 }
 
 // ============================================================================
-// Render Functions - OTHER SECTIONS
+// RENDER: Techniques
 // ============================================================================
 
 function renderTechniques() {
@@ -216,7 +221,7 @@ function renderTechniques() {
         <h2>Techniques</h2>
         <button class="btn-add" onclick="openTechniqueModal()">+ Add Technique</button>
       </div>
-      <p class="empty-message">No techniques found. Click "Add Technique" to create one.</p>
+      <p class="empty-message">No techniques yet. Create your first technique!</p>
     `;
     return;
   }
@@ -227,16 +232,16 @@ function renderTechniques() {
       <button class="btn-add" onclick="openTechniqueModal()">+ Add Technique</button>
     </div>
     <div class="items-grid">
-      ${data.techniques.map(tech => `
+      ${data.techniques.map(t => `
         <div class="item-card">
-          <h3>${tech.title || 'Untitled'}</h3>
-          <p class="meta">${tech.category || 'General'} • ${tech.difficulty_level || 'N/A'}</p>
-          <p class="description">${tech.description || 'No description'}</p>
+          <h3>${t.title || 'Untitled'}</h3>
+          <p class="meta">${t.category || 'General'} • ${t.difficulty_level || 'N/A'}</p>
+          <p class="description">${t.description || 'No description'}</p>
           <div class="card-footer">
-            <span class="badge">${tech.estimated_practice_time_hours || 'N/A'} hours</span>
+            <span class="badge">${t.estimated_practice_time_hours || 'N/A'} hrs</span>
             <div style="display: flex; gap: 8px;">
-              <button class="btn-edit" onclick="editTechnique(${tech.id})">Edit</button>
-              <button class="btn-delete" onclick="deleteTechnique(${tech.id})">Delete</button>
+              <button class="btn-edit" onclick="editTechnique(${t.id})">Edit</button>
+              <button class="btn-delete" onclick="deleteTechnique(${t.id})">Delete</button>
             </div>
           </div>
         </div>
@@ -244,6 +249,10 @@ function renderTechniques() {
     </div>
   `;
 }
+
+// ============================================================================
+// RENDER: Notes
+// ============================================================================
 
 function renderNotes() {
   const container = document.getElementById('content');
@@ -255,7 +264,7 @@ function renderNotes() {
         <h2>Notes</h2>
         <button class="btn-add" onclick="openNoteModal()">+ Add Note</button>
       </div>
-      <p class="empty-message">No notes found. Click "Add Note" to create one.</p>
+      <p class="empty-message">No notes yet. Create your first note!</p>
     `;
     return;
   }
@@ -266,16 +275,16 @@ function renderNotes() {
       <button class="btn-add" onclick="openNoteModal()">+ Add Note</button>
     </div>
     <div class="items-grid">
-      ${data.notes.map(note => `
+      ${data.notes.map(n => `
         <div class="item-card">
-          <h3>${note.title || 'Untitled'}</h3>
-          <p class="meta">${note.note_type || 'General'} • ${note.category || 'Uncategorized'}</p>
-          <p class="description">${note.content || 'No content'}</p>
+          <h3>${n.title || 'Untitled'}</h3>
+          <p class="meta">${n.category || 'General'}</p>
+          <p class="description">${n.content || 'No content'}</p>
           <div class="card-footer">
-            <span class="badge">${note.is_pinned ? '📌 Pinned' : 'Note'}</span>
+            <span class="badge">${n.is_pinned ? '📌' : 'Note'}</span>
             <div style="display: flex; gap: 8px;">
-              <button class="btn-edit" onclick="editNote(${note.id})">Edit</button>
-              <button class="btn-delete" onclick="deleteNote(${note.id})">Delete</button>
+              <button class="btn-edit" onclick="editNote(${n.id})">Edit</button>
+              <button class="btn-delete" onclick="deleteNote(${n.id})">Delete</button>
             </div>
           </div>
         </div>
@@ -283,6 +292,10 @@ function renderNotes() {
     </div>
   `;
 }
+
+// ============================================================================
+// RENDER: Videos
+// ============================================================================
 
 function renderVideos() {
   const container = document.getElementById('content');
@@ -291,30 +304,30 @@ function renderVideos() {
   if (data.resource_videos.length === 0) {
     container.innerHTML = `
       <div class="section-header">
-        <h2>Video Resources</h2>
+        <h2>Videos</h2>
         <button class="btn-add" onclick="openVideoModal()">+ Add Video</button>
       </div>
-      <p class="empty-message">No videos found. Click "Add Video" to create one.</p>
+      <p class="empty-message">No videos yet. Add your first video!</p>
     `;
     return;
   }
 
   container.innerHTML = `
     <div class="section-header">
-      <h2>Video Resources</h2>
+      <h2>Videos</h2>
       <button class="btn-add" onclick="openVideoModal()">+ Add Video</button>
     </div>
     <div class="items-grid">
-      ${data.resource_videos.map(video => `
+      ${data.resource_videos.map(v => `
         <div class="item-card">
-          <h3>${video.title || 'Untitled'}</h3>
-          <p class="meta">${video.platform || 'Unknown'} • ${video.channel_name || 'Unknown'}</p>
-          <p class="description">${video.description || 'No description'}</p>
+          <h3>${v.title || 'Untitled'}</h3>
+          <p class="meta">${v.platform || 'Unknown'} • ${v.channel_name || ''}</p>
+          <p class="description">${v.description || 'No description'}</p>
           <div class="card-footer">
-            <span class="badge">${video.duration_minutes || 'N/A'} min</span>
+            <span class="badge">${v.duration_minutes || 'N/A'} min</span>
             <div style="display: flex; gap: 8px;">
-              <button class="btn-edit" onclick="editVideo(${video.id})">Edit</button>
-              <button class="btn-delete" onclick="deleteVideo(${video.id})">Delete</button>
+              <button class="btn-edit" onclick="editVideo(${v.id})">Edit</button>
+              <button class="btn-delete" onclick="deleteVideo(${v.id})">Delete</button>
             </div>
           </div>
         </div>
@@ -322,6 +335,10 @@ function renderVideos() {
     </div>
   `;
 }
+
+// ============================================================================
+// RENDER: Links
+// ============================================================================
 
 function renderLinks() {
   const container = document.getElementById('content');
@@ -330,30 +347,30 @@ function renderLinks() {
   if (data.resource_links.length === 0) {
     container.innerHTML = `
       <div class="section-header">
-        <h2>Resource Links</h2>
+        <h2>Links</h2>
         <button class="btn-add" onclick="openLinkModal()">+ Add Link</button>
       </div>
-      <p class="empty-message">No links found. Click "Add Link" to create one.</p>
+      <p class="empty-message">No links yet. Add your first link!</p>
     `;
     return;
   }
 
   container.innerHTML = `
     <div class="section-header">
-      <h2>Resource Links</h2>
+      <h2>Links</h2>
       <button class="btn-add" onclick="openLinkModal()">+ Add Link</button>
     </div>
     <div class="items-grid">
-      ${data.resource_links.map(link => `
+      ${data.resource_links.map(l => `
         <div class="item-card">
-          <h3>${link.title || 'Untitled'}</h3>
-          <p class="meta">${link.source_website || 'Unknown'}</p>
-          <p class="description">${link.description || 'No description'}</p>
+          <h3>${l.title || 'Untitled'}</h3>
+          <p class="meta">${l.source_website || 'Unknown'}</p>
+          <p class="description">${l.description || 'No description'}</p>
           <div class="card-footer">
-            <a href="${link.url}" target="_blank" class="badge" style="text-decoration: none;">Open ↗</a>
+            <a href="${l.url}" target="_blank" class="badge" style="text-decoration: none;">Open ↗</a>
             <div style="display: flex; gap: 8px;">
-              <button class="btn-edit" onclick="editLink(${link.id})">Edit</button>
-              <button class="btn-delete" onclick="deleteLink(${link.id})">Delete</button>
+              <button class="btn-edit" onclick="editLink(${l.id})">Edit</button>
+              <button class="btn-delete" onclick="deleteLink(${l.id})">Delete</button>
             </div>
           </div>
         </div>
@@ -361,6 +378,10 @@ function renderLinks() {
     </div>
   `;
 }
+
+// ============================================================================
+// RENDER: Media
+// ============================================================================
 
 function renderMedia() {
   const container = document.getElementById('content');
@@ -369,30 +390,30 @@ function renderMedia() {
   if (data.resource_media.length === 0) {
     container.innerHTML = `
       <div class="section-header">
-        <h2>Media Files</h2>
+        <h2>Media</h2>
         <button class="btn-add" onclick="openMediaModal()">+ Add Media</button>
       </div>
-      <p class="empty-message">No media found. Click "Add Media" to create one.</p>
+      <p class="empty-message">No media yet. Add your first media file!</p>
     `;
     return;
   }
 
   container.innerHTML = `
     <div class="section-header">
-      <h2>Media Files</h2>
+      <h2>Media</h2>
       <button class="btn-add" onclick="openMediaModal()">+ Add Media</button>
     </div>
     <div class="items-grid">
-      ${data.resource_media.map(media => `
+      ${data.resource_media.map(m => `
         <div class="item-card">
-          <h3>${media.filename || 'Untitled'}</h3>
-          <p class="meta">${media.media_type || 'Unknown'}</p>
-          <p class="description">${media.description || 'No description'}</p>
+          <h3>${m.filename || 'Untitled'}</h3>
+          <p class="meta">${m.media_type || 'Unknown'}</p>
+          <p class="description">${m.description || 'No description'}</p>
           <div class="card-footer">
-            <span class="badge">${media.file_size_kb || 'N/A'} KB</span>
+            <span class="badge">${m.file_size_kb || 'N/A'} KB</span>
             <div style="display: flex; gap: 8px;">
-              <button class="btn-edit" onclick="editMedia(${media.id})">Edit</button>
-              <button class="btn-delete" onclick="deleteMedia(${media.id})">Delete</button>
+              <button class="btn-edit" onclick="editMedia(${m.id})">Edit</button>
+              <button class="btn-delete" onclick="deleteMedia(${m.id})">Delete</button>
             </div>
           </div>
         </div>
@@ -400,6 +421,10 @@ function renderMedia() {
     </div>
   `;
 }
+
+// ============================================================================
+// RENDER: Cookbooks
+// ============================================================================
 
 function renderCookbooks() {
   const container = document.getElementById('content');
@@ -411,7 +436,7 @@ function renderCookbooks() {
         <h2>Cookbooks</h2>
         <button class="btn-add" onclick="openCookbookModal()">+ Add Cookbook</button>
       </div>
-      <p class="empty-message">No cookbooks found. Click "Add Cookbook" to create one.</p>
+      <p class="empty-message">No cookbooks yet. Add your first cookbook!</p>
     `;
     return;
   }
@@ -422,16 +447,16 @@ function renderCookbooks() {
       <button class="btn-add" onclick="openCookbookModal()">+ Add Cookbook</button>
     </div>
     <div class="items-grid">
-      ${data.cookbooks.map(book => `
+      ${data.cookbooks.map(c => `
         <div class="item-card">
-          <h3>${book.title || 'Untitled'}</h3>
-          <p class="meta">${book.author || 'Unknown'} • ${book.publication_year || 'N/A'}</p>
-          <p class="description">${book.description || 'No description'}</p>
+          <h3>${c.title || 'Untitled'}</h3>
+          <p class="meta">${c.author || 'Unknown'} • ${c.publication_year || 'N/A'}</p>
+          <p class="description">${c.description || 'No description'}</p>
           <div class="card-footer">
-            <span class="badge">${book.format || 'Unknown'}</span>
+            <span class="badge">${c.format || 'Unknown'}</span>
             <div style="display: flex; gap: 8px;">
-              <button class="btn-edit" onclick="editCookbook(${book.id})">Edit</button>
-              <button class="btn-delete" onclick="deleteCookbook(${book.id})">Delete</button>
+              <button class="btn-edit" onclick="editCookbook(${c.id})">Edit</button>
+              <button class="btn-delete" onclick="deleteCookbook(${c.id})">Delete</button>
             </div>
           </div>
         </div>
@@ -441,7 +466,7 @@ function renderCookbooks() {
 }
 
 // ============================================================================
-// Modal Functions - RECIPES
+// MODALS: Recipe
 // ============================================================================
 
 function openRecipeModal(id = null) {
@@ -457,42 +482,27 @@ function openRecipeModal(id = null) {
         <form onsubmit="saveRecipe(event)">
           <div class="form-row">
             <input type="text" placeholder="Recipe Title *" value="${recipe.title || ''}" required>
-            <input type="text" placeholder="Cuisine (Italian, Asian, French)" value="${recipe.cuisine || ''}">
+            <input type="text" placeholder="Cuisine" value="${recipe.cuisine || ''}">
           </div>
-
           <div class="form-row">
-            <input type="text" placeholder="Category (Soups, Pasta, Desserts)" value="${recipe.category || ''}">
-            <select>
-              <option value="">Select Difficulty</option>
-              <option value="Beginner" ${recipe.difficulty_level === 'Beginner' ? 'selected' : ''}>Beginner</option>
-              <option value="Intermediate" ${recipe.difficulty_level === 'Intermediate' ? 'selected' : ''}>Intermediate</option>
-              <option value="Advanced" ${recipe.difficulty_level === 'Advanced' ? 'selected' : ''}>Advanced</option>
-            </select>
+            <input type="text" placeholder="Category" value="${recipe.category || ''}">
+            <select><option value="">Difficulty</option><option value="Beginner" ${recipe.difficulty_level === 'Beginner' ? 'selected' : ''}>Beginner</option><option value="Intermediate" ${recipe.difficulty_level === 'Intermediate' ? 'selected' : ''}>Intermediate</option><option value="Advanced" ${recipe.difficulty_level === 'Advanced' ? 'selected' : ''}>Advanced</option></select>
           </div>
-
           <textarea placeholder="Description" style="min-height: 80px;">${recipe.description || ''}</textarea>
-
           <div class="form-row">
             <input type="number" placeholder="Yield Amount" value="${recipe.yield_amount || ''}" min="1">
-            <input type="text" placeholder="Unit (Servings, Portions)" value="${recipe.yield_unit || ''}">
+            <input type="text" placeholder="Unit" value="${recipe.yield_unit || ''}">
           </div>
-
           <div class="form-row">
-            <input type="number" placeholder="Prep Time (minutes)" value="${recipe.prep_time_minutes || ''}" min="0">
-            <input type="number" placeholder="Cook Time (minutes)" value="${recipe.cook_time_minutes || ''}" min="0">
+            <input type="number" placeholder="Prep Time (min)" value="${recipe.prep_time_minutes || ''}" min="0">
+            <input type="number" placeholder="Cook Time (min)" value="${recipe.cook_time_minutes || ''}" min="0">
           </div>
-
           <textarea placeholder="Ingredients (one per line)" style="min-height: 120px;">${recipe.ingredients || ''}</textarea>
-
-          <textarea placeholder="Method / Instructions (step by step)" style="min-height: 120px;">${recipe.instructions || ''}</textarea>
-
+          <textarea placeholder="Method / Instructions" style="min-height: 120px;">${recipe.instructions || ''}</textarea>
           <textarea placeholder="Serving Suggestions" style="min-height: 100px;">${recipe.serving_suggestions || ''}</textarea>
-
-          <textarea placeholder="Tags (comma-separated: Classic, Indian-Inspired, Vegetarian)" style="min-height: 80px;">${tagsDisplay}</textarea>
-
-          <textarea placeholder="Notes (Tips, substitutions, storage)" style="min-height: 100px;">${recipe.notes || ''}</textarea>
-
-          <button type="submit" style="margin-top: 20px;">${id ? 'Update' : 'Create'} Recipe</button>
+          <textarea placeholder="Tags (comma-separated)" style="min-height: 80px;">${tagsDisplay}</textarea>
+          <textarea placeholder="Notes" style="min-height: 100px;">${recipe.notes || ''}</textarea>
+          <button type="submit">${id ? 'Update' : 'Create'} Recipe</button>
         </form>
       </div>
     </div>
@@ -501,7 +511,7 @@ function openRecipeModal(id = null) {
 }
 
 // ============================================================================
-// Modal Functions - SOPs (ENHANCED WITH 7 FIELDS)
+// MODALS: SOP (8 Professional Fields)
 // ============================================================================
 
 function openSOPModal(id = null) {
@@ -515,22 +525,14 @@ function openSOPModal(id = null) {
         <h2>${id ? 'Edit SOP' : 'Add SOP'}</h2>
         <form onsubmit="saveSOP(event)">
           <input type="text" placeholder="Title Page / SOP Title *" value="${sop.title_page || ''}" required>
-          
-          <textarea placeholder="Purpose (Why this SOP exists and what it accomplishes)" style="min-height: 100px;">${sop.purpose || ''}</textarea>
-          
-          <textarea placeholder="Scope (Who, what, where, when this SOP applies to)" style="min-height: 100px;">${sop.scope || ''}</textarea>
-          
-          <textarea placeholder="Definitions and Terminology (Abbreviations, technical terms, key definitions)" style="min-height: 100px;">${sop.definitions_terminology || ''}</textarea>
-          
-          <textarea placeholder="Equipment (Tools, materials, and equipment needed)" style="min-height: 100px;">${sop.equipment || ''}</textarea>
-          
-          <textarea placeholder="Procedure Steps - Main Actions (Detailed step-by-step procedures)" style="min-height: 150px;">${sop.procedure_steps || ''}</textarea>
-          
-          <textarea placeholder="Notes and Clarifications (Important notes, tips, warnings)" style="min-height: 100px;">${sop.notes_clarifications || ''}</textarea>
-          
-          <textarea placeholder="Related Documents & References (Links to other docs, appendices)" style="min-height: 100px;">${sop.related_documents_references || ''}</textarea>
-          
-          <button type="submit" style="margin-top: 20px;">${id ? 'Update' : 'Create'} SOP</button>
+          <textarea placeholder="Purpose (Why this SOP exists)" style="min-height: 100px;">${sop.purpose || ''}</textarea>
+          <textarea placeholder="Scope (Who, what, where, when applies)" style="min-height: 100px;">${sop.scope || ''}</textarea>
+          <textarea placeholder="Definitions & Terminology" style="min-height: 100px;">${sop.definitions_terminology || ''}</textarea>
+          <textarea placeholder="Equipment (Tools & materials)" style="min-height: 100px;">${sop.equipment || ''}</textarea>
+          <textarea placeholder="Procedure Steps - Main Actions" style="min-height: 150px;">${sop.procedure_steps || ''}</textarea>
+          <textarea placeholder="Notes & Clarifications (Tips, warnings)" style="min-height: 100px;">${sop.notes_clarifications || ''}</textarea>
+          <textarea placeholder="Related Documents & References" style="min-height: 100px;">${sop.related_documents_references || ''}</textarea>
+          <button type="submit">${id ? 'Update' : 'Create'} SOP</button>
         </form>
       </div>
     </div>
@@ -539,7 +541,7 @@ function openSOPModal(id = null) {
 }
 
 // ============================================================================
-// Modal Functions - OTHER SECTIONS
+// MODALS: Technique
 // ============================================================================
 
 function openTechniqueModal(id = null) {
@@ -552,15 +554,10 @@ function openTechniqueModal(id = null) {
         <span class="modal-close" onclick="closeModal()">×</span>
         <h2>${id ? 'Edit Technique' : 'Add Technique'}</h2>
         <form onsubmit="saveTechnique(event)">
-          <input type="text" placeholder="Technique Title" value="${tech.title || ''}" required>
+          <input type="text" placeholder="Technique Title *" value="${tech.title || ''}" required>
           <textarea placeholder="Description">${tech.description || ''}</textarea>
           <input type="text" placeholder="Category" value="${tech.category || ''}">
-          <select>
-            <option value="">Select Difficulty</option>
-            <option value="Beginner" ${tech.difficulty_level === 'Beginner' ? 'selected' : ''}>Beginner</option>
-            <option value="Intermediate" ${tech.difficulty_level === 'Intermediate' ? 'selected' : ''}>Intermediate</option>
-            <option value="Advanced" ${tech.difficulty_level === 'Advanced' ? 'selected' : ''}>Advanced</option>
-          </select>
+          <select><option value="">Difficulty</option><option value="Beginner" ${tech.difficulty_level === 'Beginner' ? 'selected' : ''}>Beginner</option><option value="Intermediate" ${tech.difficulty_level === 'Intermediate' ? 'selected' : ''}>Intermediate</option><option value="Advanced" ${tech.difficulty_level === 'Advanced' ? 'selected' : ''}>Advanced</option></select>
           <textarea placeholder="Step by Step">${tech.step_by_step || ''}</textarea>
           <textarea placeholder="Common Mistakes">${tech.common_mistakes || ''}</textarea>
           <textarea placeholder="Best Practices">${tech.best_practices || ''}</textarea>
@@ -571,6 +568,10 @@ function openTechniqueModal(id = null) {
   `;
   document.body.insertAdjacentHTML('beforeend', modal);
 }
+
+// ============================================================================
+// MODALS: Note
+// ============================================================================
 
 function openNoteModal(id = null) {
   currentEditingId = id;
@@ -583,7 +584,7 @@ function openNoteModal(id = null) {
         <h2>${id ? 'Edit Note' : 'Add Note'}</h2>
         <form onsubmit="saveNote(event)">
           <input type="text" placeholder="Note Title" value="${note.title || ''}">
-          <textarea placeholder="Content" required>${note.content || ''}</textarea>
+          <textarea placeholder="Content *" required>${note.content || ''}</textarea>
           <input type="text" placeholder="Category" value="${note.category || ''}">
           <button type="submit">${id ? 'Update' : 'Create'} Note</button>
         </form>
@@ -592,6 +593,10 @@ function openNoteModal(id = null) {
   `;
   document.body.insertAdjacentHTML('beforeend', modal);
 }
+
+// ============================================================================
+// MODALS: Video
+// ============================================================================
 
 function openVideoModal(id = null) {
   currentEditingId = id;
@@ -603,9 +608,9 @@ function openVideoModal(id = null) {
         <span class="modal-close" onclick="closeModal()">×</span>
         <h2>${id ? 'Edit Video' : 'Add Video'}</h2>
         <form onsubmit="saveVideo(event)">
-          <input type="text" placeholder="Video Title" value="${video.title || ''}" required>
-          <input type="url" placeholder="Video URL" value="${video.url || ''}" required>
-          <input type="text" placeholder="Platform (YouTube, Vimeo)" value="${video.platform || ''}">
+          <input type="text" placeholder="Video Title *" value="${video.title || ''}" required>
+          <input type="url" placeholder="URL *" value="${video.url || ''}" required>
+          <input type="text" placeholder="Platform" value="${video.platform || ''}">
           <input type="text" placeholder="Channel Name" value="${video.channel_name || ''}">
           <textarea placeholder="Description">${video.description || ''}</textarea>
           <button type="submit">${id ? 'Update' : 'Create'} Video</button>
@@ -615,6 +620,10 @@ function openVideoModal(id = null) {
   `;
   document.body.insertAdjacentHTML('beforeend', modal);
 }
+
+// ============================================================================
+// MODALS: Link
+// ============================================================================
 
 function openLinkModal(id = null) {
   currentEditingId = id;
@@ -626,8 +635,8 @@ function openLinkModal(id = null) {
         <span class="modal-close" onclick="closeModal()">×</span>
         <h2>${id ? 'Edit Link' : 'Add Link'}</h2>
         <form onsubmit="saveLink(event)">
-          <input type="text" placeholder="Link Title" value="${link.title || ''}" required>
-          <input type="url" placeholder="URL" value="${link.url || ''}" required>
+          <input type="text" placeholder="Link Title *" value="${link.title || ''}" required>
+          <input type="url" placeholder="URL *" value="${link.url || ''}" required>
           <textarea placeholder="Description">${link.description || ''}</textarea>
           <input type="text" placeholder="Website" value="${link.source_website || ''}">
           <button type="submit">${id ? 'Update' : 'Create'} Link</button>
@@ -637,6 +646,10 @@ function openLinkModal(id = null) {
   `;
   document.body.insertAdjacentHTML('beforeend', modal);
 }
+
+// ============================================================================
+// MODALS: Media
+// ============================================================================
 
 function openMediaModal(id = null) {
   currentEditingId = id;
@@ -648,14 +661,8 @@ function openMediaModal(id = null) {
         <span class="modal-close" onclick="closeModal()">×</span>
         <h2>${id ? 'Edit Media' : 'Add Media'}</h2>
         <form onsubmit="saveMedia(event)">
-          <input type="text" placeholder="Filename" value="${media.filename || ''}" required>
-          <select>
-            <option value="">Select Media Type</option>
-            <option value="Image" ${media.media_type === 'Image' ? 'selected' : ''}>Image</option>
-            <option value="PDF" ${media.media_type === 'PDF' ? 'selected' : ''}>PDF</option>
-            <option value="Document" ${media.media_type === 'Document' ? 'selected' : ''}>Document</option>
-            <option value="Video" ${media.media_type === 'Video' ? 'selected' : ''}>Video</option>
-          </select>
+          <input type="text" placeholder="Filename *" value="${media.filename || ''}" required>
+          <select><option value="">Media Type</option><option value="Image" ${media.media_type === 'Image' ? 'selected' : ''}>Image</option><option value="PDF" ${media.media_type === 'PDF' ? 'selected' : ''}>PDF</option><option value="Document" ${media.media_type === 'Document' ? 'selected' : ''}>Document</option><option value="Video" ${media.media_type === 'Video' ? 'selected' : ''}>Video</option></select>
           <textarea placeholder="Description">${media.description || ''}</textarea>
           <button type="submit">${id ? 'Update' : 'Create'} Media</button>
         </form>
@@ -664,6 +671,10 @@ function openMediaModal(id = null) {
   `;
   document.body.insertAdjacentHTML('beforeend', modal);
 }
+
+// ============================================================================
+// MODALS: Cookbook
+// ============================================================================
 
 function openCookbookModal(id = null) {
   currentEditingId = id;
@@ -675,7 +686,7 @@ function openCookbookModal(id = null) {
         <span class="modal-close" onclick="closeModal()">×</span>
         <h2>${id ? 'Edit Cookbook' : 'Add Cookbook'}</h2>
         <form onsubmit="saveCookbook(event)">
-          <input type="text" placeholder="Cookbook Title" value="${book.title || ''}" required>
+          <input type="text" placeholder="Cookbook Title *" value="${book.title || ''}" required>
           <input type="text" placeholder="Author" value="${book.author || ''}">
           <input type="text" placeholder="ISBN" value="${book.isbn || ''}">
           <input type="number" placeholder="Publication Year" value="${book.publication_year || ''}">
@@ -689,6 +700,10 @@ function openCookbookModal(id = null) {
   document.body.insertAdjacentHTML('beforeend', modal);
 }
 
+// ============================================================================
+// Close Modal
+// ============================================================================
+
 function closeModal(event) {
   if (event && event.target !== event.currentTarget) return;
   const modal = document.querySelector('.modal-overlay');
@@ -696,16 +711,13 @@ function closeModal(event) {
 }
 
 // ============================================================================
-// Save Functions - RECIPES
+// SAVE: Recipe
 // ============================================================================
 
 async function saveRecipe(event) {
   event.preventDefault();
-  const form = event.target;
-  const inputs = form.querySelectorAll('input, textarea, select');
-  
-  const tagsString = inputs[11].value;
-  const tags = tagsString ? tagsString.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
+  const inputs = event.target.querySelectorAll('input, textarea, select');
+  const tags = inputs[11].value.split(',').map(t => t.trim()).filter(t => t);
   
   const recipe = {
     title: inputs[0].value,
@@ -726,23 +738,21 @@ async function saveRecipe(event) {
 
   if (currentEditingId) {
     recipe.id = currentEditingId;
-    await putToAPI(`/recipes`, recipe);
+    await putToAPI('/recipes', recipe);
   } else {
-    await postToAPI(`/recipes`, recipe);
+    await postToAPI('/recipes', recipe);
   }
-
   closeModal();
   await loadAllData();
 }
 
 // ============================================================================
-// Save Functions - SOPs (ENHANCED WITH 7 FIELDS)
+// SAVE: SOP
 // ============================================================================
 
 async function saveSOP(event) {
   event.preventDefault();
-  const form = event.target;
-  const inputs = form.querySelectorAll('input, textarea');
+  const inputs = event.target.querySelectorAll('input, textarea');
   
   const sop = {
     title_page: inputs[0].value,
@@ -757,24 +767,21 @@ async function saveSOP(event) {
 
   if (currentEditingId) {
     sop.id = currentEditingId;
-    await putToAPI(`/sops`, sop);
+    await putToAPI('/sops', sop);
   } else {
-    await postToAPI(`/sops`, sop);
+    await postToAPI('/sops', sop);
   }
-
   closeModal();
   await loadAllData();
 }
 
 // ============================================================================
-// Save Functions - OTHER SECTIONS
+// SAVE: Other Sections
 // ============================================================================
 
 async function saveTechnique(event) {
   event.preventDefault();
-  const form = event.target;
-  const inputs = form.querySelectorAll('input, textarea, select');
-  
+  const inputs = event.target.querySelectorAll('input, textarea, select');
   const technique = {
     title: inputs[0].value,
     description: inputs[1].value,
@@ -784,45 +791,37 @@ async function saveTechnique(event) {
     common_mistakes: inputs[5].value,
     best_practices: inputs[6].value,
   };
-
   if (currentEditingId) {
     technique.id = currentEditingId;
-    await putToAPI(`/techniques`, technique);
+    await putToAPI('/techniques', technique);
   } else {
-    await postToAPI(`/techniques`, technique);
+    await postToAPI('/techniques', technique);
   }
-
   closeModal();
   await loadAllData();
 }
 
 async function saveNote(event) {
   event.preventDefault();
-  const form = event.target;
-  const inputs = form.querySelectorAll('input, textarea');
-  
+  const inputs = event.target.querySelectorAll('input, textarea');
   const note = {
     title: inputs[0].value,
     content: inputs[1].value,
     category: inputs[2].value,
   };
-
   if (currentEditingId) {
     note.id = currentEditingId;
-    await putToAPI(`/notes`, note);
+    await putToAPI('/notes', note);
   } else {
-    await postToAPI(`/notes`, note);
+    await postToAPI('/notes', note);
   }
-
   closeModal();
   await loadAllData();
 }
 
 async function saveVideo(event) {
   event.preventDefault();
-  const form = event.target;
-  const inputs = form.querySelectorAll('input, textarea');
-  
+  const inputs = event.target.querySelectorAll('input, textarea');
   const video = {
     title: inputs[0].value,
     url: inputs[1].value,
@@ -830,68 +829,56 @@ async function saveVideo(event) {
     channel_name: inputs[3].value,
     description: inputs[4].value,
   };
-
   if (currentEditingId) {
     video.id = currentEditingId;
-    await putToAPI(`/resource-videos`, video);
+    await putToAPI('/resource-videos', video);
   } else {
-    await postToAPI(`/resource-videos`, video);
+    await postToAPI('/resource-videos', video);
   }
-
   closeModal();
   await loadAllData();
 }
 
 async function saveLink(event) {
   event.preventDefault();
-  const form = event.target;
-  const inputs = form.querySelectorAll('input, textarea');
-  
+  const inputs = event.target.querySelectorAll('input, textarea');
   const link = {
     title: inputs[0].value,
     url: inputs[1].value,
     description: inputs[2].value,
     source_website: inputs[3].value,
   };
-
   if (currentEditingId) {
     link.id = currentEditingId;
-    await putToAPI(`/resource-links`, link);
+    await putToAPI('/resource-links', link);
   } else {
-    await postToAPI(`/resource-links`, link);
+    await postToAPI('/resource-links', link);
   }
-
   closeModal();
   await loadAllData();
 }
 
 async function saveMedia(event) {
   event.preventDefault();
-  const form = event.target;
-  const inputs = form.querySelectorAll('input, textarea, select');
-  
+  const inputs = event.target.querySelectorAll('input, textarea, select');
   const media = {
     filename: inputs[0].value,
     media_type: inputs[1].value,
     description: inputs[2].value,
   };
-
   if (currentEditingId) {
     media.id = currentEditingId;
-    await putToAPI(`/resource-media`, media);
+    await putToAPI('/resource-media', media);
   } else {
-    await postToAPI(`/resource-media`, media);
+    await postToAPI('/resource-media', media);
   }
-
   closeModal();
   await loadAllData();
 }
 
 async function saveCookbook(event) {
   event.preventDefault();
-  const form = event.target;
-  const inputs = form.querySelectorAll('input, textarea');
-  
+  const inputs = event.target.querySelectorAll('input, textarea');
   const cookbook = {
     title: inputs[0].value,
     author: inputs[1].value,
@@ -900,20 +887,18 @@ async function saveCookbook(event) {
     description: inputs[4].value,
     cuisine_type: inputs[5].value,
   };
-
   if (currentEditingId) {
     cookbook.id = currentEditingId;
-    await putToAPI(`/cookbooks`, cookbook);
+    await putToAPI('/cookbooks', cookbook);
   } else {
-    await postToAPI(`/cookbooks`, cookbook);
+    await postToAPI('/cookbooks', cookbook);
   }
-
   closeModal();
   await loadAllData();
 }
 
 // ============================================================================
-// Delete Functions
+// DELETE
 // ============================================================================
 
 async function deleteRecipe(id) {
@@ -973,7 +958,7 @@ async function deleteCookbook(id) {
 }
 
 // ============================================================================
-// Edit Functions
+// EDIT
 // ============================================================================
 
 function editRecipe(id) { openRecipeModal(id); }
@@ -986,7 +971,7 @@ function editMedia(id) { openMediaModal(id); }
 function editCookbook(id) { openCookbookModal(id); }
 
 // ============================================================================
-// Make functions global
+// GLOBAL
 // ============================================================================
 
 window.switchView = switchView;
@@ -1025,10 +1010,8 @@ window.saveMedia = saveMedia;
 window.saveCookbook = saveCookbook;
 
 // ============================================================================
-// Initialize
+// INIT
 // ============================================================================
 
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('Kitchen Database App v3 Loaded');
-  loadAllData();
-});
+console.log('🍳 Chef Virtu Kitchen Database - Loading...');
+document.addEventListener('DOMContentLoaded', loadAllData);
