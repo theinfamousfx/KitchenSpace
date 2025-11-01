@@ -123,7 +123,7 @@ export default function Home() {
               </div>
 
               <div className="card" onClick={() => handleSectionClick('videos')}>
-                <div className="card-icon">📚</div>
+                <div className="card-icon">🎬</div>
                 <h3 className="card-title">Resources</h3>
                 <p className="card-description">Videos, links, and media library</p>
                 <button className="card-btn">Videos, links, and reference materials.</button>
@@ -148,94 +148,108 @@ export default function Home() {
         }
 
         body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-            'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+          font-family: 'Georgia', 'Garamond', serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
-          background-color: #f8f9fa;
-          color: #212529;
+          background: linear-gradient(135deg, #f0cf92 0%, #f5dba8 100%);
+          color: #2c3e50;
           line-height: 1.6;
+          min-height: 100vh;
+        }
+
+        html {
+          background: linear-gradient(135deg, #f0cf92 0%, #f5dba8 100%);
         }
 
         .app-container {
           min-height: 100vh;
-          background-color: #ffffff;
+          background: transparent;
         }
 
         .app-header {
-          padding: 24px 32px;
-          border-bottom: 1px solid #e9ecef;
-          background-color: #ffffff;
+          padding: 32px 48px;
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(10px);
+          border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         .app-title {
-          font-size: 32px;
+          font-size: 42px;
           font-weight: 700;
-          color: #212529;
-          margin-bottom: 16px;
+          color: #2c3e50;
+          margin-bottom: 20px;
+          letter-spacing: -0.5px;
         }
 
         .search-input {
           width: 100%;
-          max-width: 300px;
-          padding: 10px 16px;
-          border: 1px solid #dee2e6;
-          border-radius: 6px;
-          font-size: 14px;
-          color: #495057;
-          background-color: #ffffff;
-          transition: all 0.2s ease;
+          max-width: 320px;
+          padding: 12px 18px;
+          border: 2px solid #e8d4b0;
+          border-radius: 8px;
+          font-size: 15px;
+          color: #5a6c7d;
+          background: linear-gradient(135deg, #ffffff 0%, #fafaf8 100%);
+          transition: all 0.3s ease;
+          font-family: inherit;
         }
 
         .search-input:focus {
           outline: none;
-          border-color: #007bff;
-          box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+          border-color: #d4a574;
+          box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.1);
+          background: #ffffff;
         }
 
         .search-input::placeholder {
-          color: #6c757d;
+          color: #9ca3af;
         }
 
         .app-nav {
           display: flex;
           flex-wrap: wrap;
           gap: 12px;
-          padding: 20px 32px;
-          background-color: #f8f9fa;
-          border-bottom: 1px solid #e9ecef;
+          padding: 24px 48px;
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(10px);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
         }
 
         .nav-btn {
-          display: flex;
+          display: inline-flex;
           align-items: center;
           gap: 8px;
-          padding: 10px 20px;
-          border: 1px solid #dee2e6;
-          border-radius: 6px;
-          background-color: #ffffff;
-          color: #495057;
+          padding: 11px 22px;
+          border: 1.5px solid #e8d4b0;
+          border-radius: 8px;
+          background: linear-gradient(135deg, #ffffff 0%, #fafaf8 100%);
+          color: #5a6c7d;
           font-size: 14px;
           font-weight: 500;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all 0.3s ease;
+          font-family: inherit;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
         }
 
         .nav-btn:hover {
-          background-color: #f8f9fa;
-          border-color: #adb5bd;
-          transform: translateY(-1px);
+          border-color: #d4a574;
+          background: linear-gradient(135deg, #fefdf9 0%, #ffffff 100%);
+          box-shadow: 0 4px 12px rgba(212, 165, 116, 0.15);
+          transform: translateY(-2px);
         }
 
         .nav-btn.active {
-          background-color: #007bff;
+          background: linear-gradient(135deg, #d4a574 0%, #c89560 100%);
           color: #ffffff;
-          border-color: #007bff;
+          border-color: #c89560;
+          box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
         }
 
         .main-content {
-          padding: 48px 32px;
-          max-width: 1400px;
+          padding: 56px 48px;
+          max-width: 1600px;
           margin: 0 auto;
         }
 
@@ -244,107 +258,173 @@ export default function Home() {
         }
 
         .welcome-title {
-          font-size: 36px;
+          font-size: 44px;
           font-weight: 700;
-          color: #212529;
+          color: #2c3e50;
           margin-bottom: 16px;
+          letter-spacing: -0.5px;
         }
 
         .welcome-subtitle {
           font-size: 18px;
-          color: #6c757d;
-          margin-bottom: 48px;
-          max-width: 800px;
+          color: #5a6c7d;
+          margin-bottom: 56px;
+          max-width: 700px;
           margin-left: auto;
           margin-right: auto;
+          font-weight: 400;
         }
 
         .grid-container {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-          gap: 24px;
+          grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+          gap: 32px;
           margin-top: 32px;
         }
 
         .card {
-          padding: 32px;
-          border: 1px solid #e9ecef;
-          border-radius: 12px;
-          background-color: #ffffff;
+          padding: 40px 32px;
+          border: 2px solid rgba(255, 255, 255, 0.8);
+          border-radius: 16px;
+          background: rgba(255, 255, 255, 0.92);
+          backdrop-filter: blur(10px);
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
           text-align: center;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+          transition: left 0.5s ease;
+        }
+
+        .card:hover::before {
+          left: 100%;
         }
 
         .card:hover {
-          border-color: #007bff;
-          box-shadow: 0 8px 24px rgba(0, 123, 255, 0.12);
-          transform: translateY(-4px);
+          border-color: #d4a574;
+          box-shadow: 0 16px 40px rgba(212, 165, 116, 0.25);
+          transform: translateY(-8px);
+          background: rgba(255, 255, 255, 0.98);
         }
 
         .card-icon {
-          font-size: 48px;
-          margin-bottom: 16px;
+          font-size: 56px;
+          margin-bottom: 20px;
+          display: inline-block;
+          transition: all 0.3s ease;
+        }
+
+        .card:hover .card-icon {
+          transform: scale(1.15) rotateZ(5deg);
         }
 
         .card-title {
-          font-size: 24px;
-          font-weight: 600;
-          color: #212529;
+          font-size: 26px;
+          font-weight: 700;
+          color: #2c3e50;
           margin-bottom: 12px;
+          letter-spacing: -0.3px;
         }
 
         .card-description {
-          font-size: 14px;
-          color: #6c757d;
-          margin-bottom: 20px;
-          line-height: 1.5;
+          font-size: 15px;
+          color: #7a8a99;
+          margin-bottom: 28px;
+          line-height: 1.6;
         }
 
         .card-btn {
           width: 100%;
-          padding: 12px 24px;
+          padding: 14px 24px;
           border: none;
-          border-radius: 6px;
-          background-color: #007bff;
+          border-radius: 10px;
+          background: linear-gradient(135deg, #d4a574 0%, #c89560 100%);
           color: #ffffff;
-          font-size: 14px;
-          font-weight: 500;
+          font-size: 15px;
+          font-weight: 600;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all 0.3s ease;
+          font-family: inherit;
+          box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+          letter-spacing: 0.3px;
         }
 
         .card-btn:hover {
-          background-color: #0056b3;
-          transform: scale(1.02);
+          background: linear-gradient(135deg, #c89560 0%, #b8854d 100%);
+          box-shadow: 0 6px 20px rgba(212, 165, 116, 0.4);
+          transform: translateY(-2px);
         }
 
         .card-btn:active {
-          transform: scale(0.98);
+          transform: translateY(0);
+          box-shadow: 0 2px 8px rgba(212, 165, 116, 0.25);
         }
 
         /* Responsive Design */
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
           .app-header {
-            padding: 20px 16px;
-          }
-
-          .app-title {
-            font-size: 24px;
+            padding: 28px 32px;
           }
 
           .app-nav {
-            padding: 16px;
+            padding: 20px 32px;
+          }
+
+          .main-content {
+            padding: 40px 32px;
+          }
+
+          .app-title {
+            font-size: 36px;
+          }
+
+          .welcome-title {
+            font-size: 36px;
+          }
+
+          .grid-container {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .app-header {
+            padding: 20px 20px;
+          }
+
+          .app-title {
+            font-size: 28px;
+            margin-bottom: 16px;
+          }
+
+          .search-input {
+            max-width: 100%;
+          }
+
+          .app-nav {
+            padding: 16px 20px;
             gap: 8px;
           }
 
           .nav-btn {
             font-size: 13px;
-            padding: 8px 14px;
+            padding: 9px 16px;
           }
 
           .main-content {
-            padding: 32px 16px;
+            padding: 32px 20px;
           }
 
           .welcome-title {
@@ -353,65 +433,79 @@ export default function Home() {
 
           .welcome-subtitle {
             font-size: 16px;
+            margin-bottom: 36px;
           }
 
           .grid-container {
             grid-template-columns: 1fr;
-            gap: 16px;
+            gap: 20px;
           }
 
           .card {
-            padding: 24px;
+            padding: 32px 24px;
           }
 
           .card-icon {
-            font-size: 40px;
+            font-size: 48px;
+            margin-bottom: 16px;
           }
 
           .card-title {
-            font-size: 20px;
+            font-size: 22px;
+          }
+
+          .card-description {
+            font-size: 14px;
+            margin-bottom: 20px;
+          }
+
+          .card-btn {
+            padding: 12px 20px;
+            font-size: 14px;
           }
         }
 
         /* Additional styles for dynamic content */
         .items-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-          gap: 20px;
-          margin-top: 24px;
+          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+          gap: 24px;
+          margin-top: 28px;
         }
 
         .item-card {
-          padding: 20px;
-          border: 1px solid #e9ecef;
-          border-radius: 8px;
-          background-color: #ffffff;
+          padding: 24px;
+          border: 2px solid rgba(255, 255, 255, 0.8);
+          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.9);
+          backdrop-filter: blur(10px);
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
         }
 
         .item-card:hover {
-          border-color: #007bff;
-          box-shadow: 0 4px 12px rgba(0, 123, 255, 0.1);
-          transform: translateY(-2px);
+          border-color: #d4a574;
+          box-shadow: 0 8px 20px rgba(212, 165, 116, 0.15);
+          transform: translateY(-4px);
         }
 
         .item-card h3 {
-          font-size: 18px;
+          font-size: 20px;
           font-weight: 600;
-          color: #212529;
+          color: #2c3e50;
           margin-bottom: 8px;
         }
 
         .item-card .meta {
           font-size: 13px;
-          color: #6c757d;
+          color: #9ca3af;
           margin-bottom: 12px;
         }
 
         .item-card .description {
           font-size: 14px;
-          color: #495057;
+          color: #5a6c7d;
           margin-bottom: 16px;
           line-height: 1.5;
         }
@@ -422,68 +516,71 @@ export default function Home() {
           align-items: center;
           margin-top: 16px;
           padding-top: 16px;
-          border-top: 1px solid #e9ecef;
+          border-top: 1px solid rgba(0, 0, 0, 0.06);
         }
 
         .badge {
           display: inline-block;
-          padding: 4px 12px;
-          border-radius: 12px;
-          background-color: #e7f3ff;
-          color: #007bff;
+          padding: 5px 14px;
+          border-radius: 20px;
+          background: linear-gradient(135deg, #f0cf92 0%, #f5dba8 100%);
+          color: #2c3e50;
           font-size: 12px;
-          font-weight: 500;
+          font-weight: 600;
         }
 
         .btn-delete {
-          padding: 6px 12px;
-          border: 1px solid #dc3545;
-          border-radius: 4px;
-          background-color: transparent;
-          color: #dc3545;
+          padding: 7px 14px;
+          border: 1.5px solid #e57373;
+          border-radius: 6px;
+          background: transparent;
+          color: #e57373;
           font-size: 13px;
+          font-weight: 500;
           cursor: pointer;
           transition: all 0.2s ease;
         }
 
         .btn-delete:hover {
-          background-color: #dc3545;
-          color: #ffffff;
+          background: #ffebee;
+          border-color: #ef5350;
         }
 
         .section-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 24px;
+          margin-bottom: 28px;
         }
 
         .section-header h2 {
-          font-size: 28px;
-          font-weight: 600;
-          color: #212529;
+          font-size: 32px;
+          font-weight: 700;
+          color: #2c3e50;
         }
 
         .btn-add {
-          padding: 10px 20px;
+          padding: 12px 24px;
           border: none;
-          border-radius: 6px;
-          background-color: #28a745;
+          border-radius: 8px;
+          background: linear-gradient(135deg, #d4a574 0%, #c89560 100%);
           color: #ffffff;
           font-size: 14px;
-          font-weight: 500;
+          font-weight: 600;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
         }
 
         .btn-add:hover {
-          background-color: #218838;
+          background: linear-gradient(135deg, #c89560 0%, #b8854d 100%);
+          box-shadow: 0 6px 16px rgba(212, 165, 116, 0.4);
         }
 
         .empty-message {
           text-align: center;
-          padding: 48px 20px;
-          color: #6c757d;
+          padding: 56px 24px;
+          color: #9ca3af;
           font-size: 16px;
         }
 
@@ -494,90 +591,101 @@ export default function Home() {
           left: 0;
           right: 0;
           bottom: 0;
-          background-color: rgba(0, 0, 0, 0.5);
+          background-color: rgba(0, 0, 0, 0.4);
           display: flex;
           align-items: center;
           justify-content: center;
           z-index: 1000;
+          backdrop-filter: blur(4px);
         }
 
         .modal {
-          background-color: #ffffff;
-          border-radius: 12px;
-          padding: 32px;
+          background: linear-gradient(135deg, #ffffff 0%, #fafaf8 100%);
+          border-radius: 16px;
+          padding: 40px;
           max-width: 600px;
           width: 90%;
           max-height: 90vh;
           overflow-y: auto;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+          border: 2px solid rgba(212, 165, 116, 0.2);
         }
 
         .modal-close {
           float: right;
-          font-size: 28px;
+          font-size: 32px;
           font-weight: 700;
-          color: #6c757d;
+          color: #9ca3af;
           cursor: pointer;
           line-height: 1;
+          transition: all 0.2s ease;
         }
 
         .modal-close:hover {
-          color: #212529;
+          color: #2c3e50;
+          transform: rotate(90deg);
         }
 
         .modal h2 {
-          font-size: 24px;
-          font-weight: 600;
-          color: #212529;
-          margin-bottom: 24px;
+          font-size: 28px;
+          font-weight: 700;
+          color: #2c3e50;
+          margin-bottom: 28px;
+          letter-spacing: -0.3px;
         }
 
         .modal form {
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 18px;
         }
 
         .modal input,
         .modal textarea,
         .modal select {
           width: 100%;
-          padding: 10px 14px;
-          border: 1px solid #dee2e6;
-          border-radius: 6px;
+          padding: 12px 16px;
+          border: 2px solid #e8d4b0;
+          border-radius: 8px;
           font-size: 14px;
-          color: #495057;
-          background-color: #ffffff;
+          color: #5a6c7d;
+          background: rgba(255, 255, 255, 0.95);
           font-family: inherit;
+          transition: all 0.3s ease;
         }
 
         .modal input:focus,
         .modal textarea:focus,
         .modal select:focus {
           outline: none;
-          border-color: #007bff;
-          box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+          border-color: #d4a574;
+          box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.1);
+          background: #ffffff;
         }
 
         .modal textarea {
           resize: vertical;
-          min-height: 100px;
+          min-height: 120px;
         }
 
         .modal button[type="submit"] {
-          padding: 12px 24px;
+          padding: 14px 28px;
           border: none;
-          border-radius: 6px;
-          background-color: #007bff;
+          border-radius: 8px;
+          background: linear-gradient(135deg, #d4a574 0%, #c89560 100%);
           color: #ffffff;
-          font-size: 14px;
-          font-weight: 500;
+          font-size: 15px;
+          font-weight: 600;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+          letter-spacing: 0.3px;
         }
 
         .modal button[type="submit"]:hover {
-          background-color: #0056b3;
+          background: linear-gradient(135deg, #c89560 0%, #b8854d 100%);
+          box-shadow: 0 6px 20px rgba(212, 165, 116, 0.4);
+          transform: translateY(-2px);
         }
       `}</style>
     </>
