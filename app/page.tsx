@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 
 export default function Home() {
   useEffect(() => {
-    // Load app.js for dynamic functionality
     const script = document.createElement('script');
     script.src = '/app.js';
     script.async = true;
@@ -36,54 +35,14 @@ export default function Home() {
         </header>
 
         <nav className="app-nav" id="navigation">
-          <button
-            className="nav-btn"
-            onClick={() => handleSectionClick('recipes')}
-          >
-            📖 Recipes
-          </button>
-          <button
-            className="nav-btn"
-            onClick={() => handleSectionClick('sops')}
-          >
-            📋 SOPs
-          </button>
-          <button
-            className="nav-btn"
-            onClick={() => handleSectionClick('techniques')}
-          >
-            🎯 Techniques
-          </button>
-          <button
-            className="nav-btn"
-            onClick={() => handleSectionClick('notes')}
-          >
-            📝 Notes
-          </button>
-          <button
-            className="nav-btn"
-            onClick={() => handleSectionClick('videos')}
-          >
-            🎥 Videos
-          </button>
-          <button
-            className="nav-btn"
-            onClick={() => handleSectionClick('links')}
-          >
-            🔗 Links
-          </button>
-          <button
-            className="nav-btn"
-            onClick={() => handleSectionClick('media')}
-          >
-            📁 Media
-          </button>
-          <button
-            className="nav-btn"
-            onClick={() => handleSectionClick('cookbooks')}
-          >
-            📚 Cookbooks
-          </button>
+          <button className="nav-btn" onClick={() => handleSectionClick('recipes')}>📖 Recipes</button>
+          <button className="nav-btn" onClick={() => handleSectionClick('sops')}>📋 SOPs</button>
+          <button className="nav-btn" onClick={() => handleSectionClick('techniques')}>🎯 Techniques</button>
+          <button className="nav-btn" onClick={() => handleSectionClick('notes')}>📝 Notes</button>
+          <button className="nav-btn" onClick={() => handleSectionClick('videos')}>🎥 Videos</button>
+          <button className="nav-btn" onClick={() => handleSectionClick('links')}>🔗 Links</button>
+          <button className="nav-btn" onClick={() => handleSectionClick('media')}>📁 Media</button>
+          <button className="nav-btn" onClick={() => handleSectionClick('cookbooks')}>📚 Cookbooks</button>
         </nav>
 
         <main className="main-content" id="content">
@@ -194,10 +153,6 @@ export default function Home() {
           border-color: #d4a574;
           box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.1);
           background: #ffffff;
-        }
-
-        .search-input::placeholder {
-          color: #9ca3af;
         }
 
         .app-nav {
@@ -338,34 +293,258 @@ export default function Home() {
           line-height: 1.6;
         }
 
-        .card-btn {
+        /* Modal styles for app.js */
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0, 0, 0, 0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          backdrop-filter: blur(4px);
+          padding: 20px;
+        }
+
+        .modal {
+          background: linear-gradient(135deg, #ffffff 0%, #fafaf8 100%);
+          border-radius: 16px;
+          padding: 40px;
+          max-width: 600px;
           width: 100%;
-          padding: 14px 24px;
+          max-height: 90vh;
+          overflow-y: auto;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+          border: 2px solid rgba(212, 165, 116, 0.2);
+        }
+
+        .modal-large {
+          max-width: 800px;
+        }
+
+        .modal-close {
+          float: right;
+          font-size: 32px;
+          font-weight: 700;
+          color: #9ca3af;
+          cursor: pointer;
+          line-height: 1;
+          transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+          color: #2c3e50;
+          transform: rotate(90deg);
+        }
+
+        .modal h2 {
+          font-size: 28px;
+          font-weight: 700;
+          color: #2c3e50;
+          margin-bottom: 28px;
+          letter-spacing: -0.3px;
+          clear: both;
+        }
+
+        .modal form {
+          display: flex;
+          flex-direction: column;
+          gap: 18px;
+        }
+
+        .form-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+        }
+
+        .modal input,
+        .modal textarea,
+        .modal select {
+          width: 100%;
+          padding: 12px 16px;
+          border: 2px solid #e8d4b0;
+          border-radius: 8px;
+          font-size: 14px;
+          color: #5a6c7d;
+          background: rgba(255, 255, 255, 0.95);
+          font-family: inherit;
+          transition: all 0.3s ease;
+        }
+
+        .modal input:focus,
+        .modal textarea:focus,
+        .modal select:focus {
+          outline: none;
+          border-color: #d4a574;
+          box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.1);
+          background: #ffffff;
+        }
+
+        .modal textarea {
+          resize: vertical;
+          min-height: 100px;
+        }
+
+        .modal button[type="submit"] {
+          padding: 14px 28px;
           border: none;
-          border-radius: 10px;
+          border-radius: 8px;
           background: linear-gradient(135deg, #d4a574 0%, #c89560 100%);
           color: #ffffff;
           font-size: 15px;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.3s ease;
-          font-family: inherit;
           box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
           letter-spacing: 0.3px;
         }
 
-        .card-btn:hover {
+        .modal button[type="submit"]:hover {
           background: linear-gradient(135deg, #c89560 0%, #b8854d 100%);
           box-shadow: 0 6px 20px rgba(212, 165, 116, 0.4);
           transform: translateY(-2px);
         }
 
-        .card-btn:active {
-          transform: translateY(0);
-          box-shadow: 0 2px 8px rgba(212, 165, 116, 0.25);
+        /* Item cards styles */
+        .section-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 28px;
         }
 
-        /* Responsive Design */
+        .section-header h2 {
+          font-size: 32px;
+          font-weight: 700;
+          color: #2c3e50;
+        }
+
+        .btn-add {
+          padding: 12px 24px;
+          border: none;
+          border-radius: 8px;
+          background: linear-gradient(135deg, #d4a574 0%, #c89560 100%);
+          color: #ffffff;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+        }
+
+        .btn-add:hover {
+          background: linear-gradient(135deg, #c89560 0%, #b8854d 100%);
+          box-shadow: 0 6px 16px rgba(212, 165, 116, 0.4);
+        }
+
+        .items-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+          gap: 24px;
+          margin-top: 28px;
+        }
+
+        .item-card {
+          padding: 24px;
+          border: 2px solid rgba(255, 255, 255, 0.8);
+          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.9);
+          backdrop-filter: blur(10px);
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .item-card:hover {
+          border-color: #d4a574;
+          box-shadow: 0 8px 20px rgba(212, 165, 116, 0.15);
+          transform: translateY(-4px);
+        }
+
+        .item-card h3 {
+          font-size: 20px;
+          font-weight: 600;
+          color: #2c3e50;
+          margin-bottom: 8px;
+        }
+
+        .item-card .meta {
+          font-size: 13px;
+          color: #9ca3af;
+          margin-bottom: 12px;
+        }
+
+        .item-card .description {
+          font-size: 14px;
+          color: #5a6c7d;
+          margin-bottom: 16px;
+          line-height: 1.5;
+        }
+
+        .card-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 16px;
+          padding-top: 16px;
+          border-top: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .badge {
+          display: inline-block;
+          padding: 5px 14px;
+          border-radius: 20px;
+          background: linear-gradient(135deg, #f0cf92 0%, #f5dba8 100%);
+          color: #2c3e50;
+          font-size: 12px;
+          font-weight: 600;
+        }
+
+        .btn-edit {
+          padding: 7px 14px;
+          border: 1.5px solid #d4a574;
+          border-radius: 6px;
+          background: transparent;
+          color: #d4a574;
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .btn-edit:hover {
+          background: #f0cf92;
+          color: #2c3e50;
+        }
+
+        .btn-delete {
+          padding: 7px 14px;
+          border: 1.5px solid #e57373;
+          border-radius: 6px;
+          background: transparent;
+          color: #e57373;
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .btn-delete:hover {
+          background: #ffebee;
+          border-color: #ef5350;
+        }
+
+        .empty-message {
+          text-align: center;
+          padding: 56px 24px;
+          color: #9ca3af;
+          font-size: 16px;
+        }
+
         @media (max-width: 1024px) {
           .app-header {
             padding: 28px 32px;
@@ -448,238 +627,13 @@ export default function Home() {
             font-size: 22px;
           }
 
-          .card-description {
-            font-size: 14px;
-            margin-bottom: 20px;
+          .modal {
+            padding: 24px;
           }
 
-          .card-btn {
-            padding: 12px 20px;
-            font-size: 14px;
+          .form-row {
+            grid-template-columns: 1fr;
           }
-        }
-
-        /* Additional styles for dynamic content */
-        .items-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-          gap: 24px;
-          margin-top: 28px;
-        }
-
-        .item-card {
-          padding: 24px;
-          border: 2px solid rgba(255, 255, 255, 0.8);
-          border-radius: 12px;
-          background: rgba(255, 255, 255, 0.9);
-          backdrop-filter: blur(10px);
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-        }
-
-        .item-card:hover {
-          border-color: #d4a574;
-          box-shadow: 0 8px 20px rgba(212, 165, 116, 0.15);
-          transform: translateY(-4px);
-        }
-
-        .item-card h3 {
-          font-size: 20px;
-          font-weight: 600;
-          color: #2c3e50;
-          margin-bottom: 8px;
-        }
-
-        .item-card .meta {
-          font-size: 13px;
-          color: #9ca3af;
-          margin-bottom: 12px;
-        }
-
-        .item-card .description {
-          font-size: 14px;
-          color: #5a6c7d;
-          margin-bottom: 16px;
-          line-height: 1.5;
-        }
-
-        .item-card .card-footer {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-top: 16px;
-          padding-top: 16px;
-          border-top: 1px solid rgba(0, 0, 0, 0.06);
-        }
-
-        .badge {
-          display: inline-block;
-          padding: 5px 14px;
-          border-radius: 20px;
-          background: linear-gradient(135deg, #f0cf92 0%, #f5dba8 100%);
-          color: #2c3e50;
-          font-size: 12px;
-          font-weight: 600;
-        }
-
-        .btn-delete {
-          padding: 7px 14px;
-          border: 1.5px solid #e57373;
-          border-radius: 6px;
-          background: transparent;
-          color: #e57373;
-          font-size: 13px;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .btn-delete:hover {
-          background: #ffebee;
-          border-color: #ef5350;
-        }
-
-        .section-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 28px;
-        }
-
-        .section-header h2 {
-          font-size: 32px;
-          font-weight: 700;
-          color: #2c3e50;
-        }
-
-        .btn-add {
-          padding: 12px 24px;
-          border: none;
-          border-radius: 8px;
-          background: linear-gradient(135deg, #d4a574 0%, #c89560 100%);
-          color: #ffffff;
-          font-size: 14px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
-        }
-
-        .btn-add:hover {
-          background: linear-gradient(135deg, #c89560 0%, #b8854d 100%);
-          box-shadow: 0 6px 16px rgba(212, 165, 116, 0.4);
-        }
-
-        .empty-message {
-          text-align: center;
-          padding: 56px 24px;
-          color: #9ca3af;
-          font-size: 16px;
-        }
-
-        /* Modal styles */
-        .modal-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: rgba(0, 0, 0, 0.4);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-          backdrop-filter: blur(4px);
-        }
-
-        .modal {
-          background: linear-gradient(135deg, #ffffff 0%, #fafaf8 100%);
-          border-radius: 16px;
-          padding: 40px;
-          max-width: 600px;
-          width: 90%;
-          max-height: 90vh;
-          overflow-y: auto;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-          border: 2px solid rgba(212, 165, 116, 0.2);
-        }
-
-        .modal-close {
-          float: right;
-          font-size: 32px;
-          font-weight: 700;
-          color: #9ca3af;
-          cursor: pointer;
-          line-height: 1;
-          transition: all 0.2s ease;
-        }
-
-        .modal-close:hover {
-          color: #2c3e50;
-          transform: rotate(90deg);
-        }
-
-        .modal h2 {
-          font-size: 28px;
-          font-weight: 700;
-          color: #2c3e50;
-          margin-bottom: 28px;
-          letter-spacing: -0.3px;
-        }
-
-        .modal form {
-          display: flex;
-          flex-direction: column;
-          gap: 18px;
-        }
-
-        .modal input,
-        .modal textarea,
-        .modal select {
-          width: 100%;
-          padding: 12px 16px;
-          border: 2px solid #e8d4b0;
-          border-radius: 8px;
-          font-size: 14px;
-          color: #5a6c7d;
-          background: rgba(255, 255, 255, 0.95);
-          font-family: inherit;
-          transition: all 0.3s ease;
-        }
-
-        .modal input:focus,
-        .modal textarea:focus,
-        .modal select:focus {
-          outline: none;
-          border-color: #d4a574;
-          box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.1);
-          background: #ffffff;
-        }
-
-        .modal textarea {
-          resize: vertical;
-          min-height: 120px;
-        }
-
-        .modal button[type="submit"] {
-          padding: 14px 28px;
-          border: none;
-          border-radius: 8px;
-          background: linear-gradient(135deg, #d4a574 0%, #c89560 100%);
-          color: #ffffff;
-          font-size: 15px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
-          letter-spacing: 0.3px;
-        }
-
-        .modal button[type="submit"]:hover {
-          background: linear-gradient(135deg, #c89560 0%, #b8854d 100%);
-          box-shadow: 0 6px 20px rgba(212, 165, 116, 0.4);
-          transform: translateY(-2px);
         }
       `}</style>
     </>

@@ -1,7 +1,7 @@
 // ============================================================================
-// Kitchen Database - Frontend Application (UPDATED)
+// Kitchen Database - Frontend Application (COMPLETE v2)
 // Connected to PostgreSQL via Next.js API routes
-// Full CRUD functionality with database integration
+// Full CRUD with Enhanced Recipe Fields
 // ============================================================================
 
 const API_BASE = '/api';
@@ -31,7 +31,6 @@ async function fetchFromAPI(endpoint) {
     return await response.json();
   } catch (error) {
     console.error(`Failed to fetch from ${endpoint}:`, error);
-    alert('Error loading data. Please check your connection.');
     return [];
   }
 }
@@ -44,12 +43,9 @@ async function postToAPI(endpoint, payload) {
       body: JSON.stringify(payload),
     });
     if (!response.ok) throw new Error(`API error: ${response.status}`);
-    const result = await response.json();
-    alert('Item created successfully!');
-    return result;
+    return await response.json();
   } catch (error) {
     console.error(`Failed to POST to ${endpoint}:`, error);
-    alert('Error creating item. Please try again.');
     return null;
   }
 }
@@ -62,12 +58,9 @@ async function putToAPI(endpoint, payload) {
       body: JSON.stringify(payload),
     });
     if (!response.ok) throw new Error(`API error: ${response.status}`);
-    const result = await response.json();
-    alert('Item updated successfully!');
-    return result;
+    return await response.json();
   } catch (error) {
     console.error(`Failed to PUT to ${endpoint}:`, error);
-    alert('Error updating item. Please try again.');
     return null;
   }
 }
@@ -78,11 +71,9 @@ async function deleteFromAPI(endpoint) {
       method: 'DELETE',
     });
     if (!response.ok) throw new Error(`API error: ${response.status}`);
-    alert('Item deleted successfully!');
     return await response.json();
   } catch (error) {
     console.error(`Failed to DELETE from ${endpoint}:`, error);
-    alert('Error deleting item. Please try again.');
     return null;
   }
 }
@@ -101,7 +92,6 @@ async function loadAllData() {
   data.resource_links = await fetchFromAPI('/resource-links');
   data.resource_media = await fetchFromAPI('/resource-media');
   data.cookbooks = await fetchFromAPI('/cookbooks');
-  console.log('Data loaded:', data);
   renderCurrentView();
 }
 
@@ -116,7 +106,9 @@ function switchView(view) {
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.classList.remove('active');
   });
-  event.target.classList.add('active');
+  if (event && event.target) {
+    event.target.classList.add('active');
+  }
 }
 
 function renderCurrentView() {
@@ -164,10 +156,30 @@ function renderRecipes() {
       ${data.recipes.map(recipe => `
         <div class="item-card">
           <h3>${recipe.title || 'Untitled'}</h3>
-          <p class="meta">${recipe.cuisine || 'Unknown'} • ${recipe.difficulty_level || 'N/A'}</p>
+          <p class="meta">
+            ${recipe.cuisine || 'Unknown'} • 
+            ${recipe.category || 'Uncategorized'} • 
+            ${recipe.difficulty_level || 'N/A'}
+          </p>
           <p class="description">${recipe.description || 'No description'}</p>
+          
+          ${recipe.yield_amount ? `<p style="font-size: 13px; color: #7a8a99; margin: 8px 0;"><strong>Yields:</strong> ${recipe.yield_amount} ${recipe.yield_unit || 'servings'}</p>` : ''}
+          
+          ${recipe.prep_time_minutes || recipe.cook_time_minutes ? `
+            <p style="font-size: 13px; color: #7a8a99; margin: 8px 0;">
+              <strong>Time:</strong> 
+              ${recipe.prep_time_minutes ? `Prep ${recipe.prep_time_minutes}min` : ''} 
+              ${recipe.cook_time_minutes ? `Cook ${recipe.cook_time_minutes}min` : ''}
+            </p>
+          ` : ''}
+          
+          ${recipe.tags && recipe.tags.length > 0 ? `
+            <div style="margin: 12px 0; display: flex; flex-wrap: wrap; gap: 6px;">
+              ${recipe.tags.map(tag => `<span class="badge">${tag}</span>`).join('')}
+            </div>
+          ` : ''}
+          
           <div class="card-footer">
-            <span class="badge">${recipe.yield_amount || 'N/A'} ${recipe.yield_unit || ''}</span>
             <div style="display: flex; gap: 8px;">
               <button class="btn-edit" onclick="editRecipe(${recipe.id})">Edit</button>
               <button class="btn-delete" onclick="deleteRecipe(${recipe.id})">Delete</button>
@@ -362,7 +374,7 @@ function renderLinks() {
           <p class="meta">${link.source_website || 'Unknown'}</p>
           <p class="description">${link.description || 'No description'}</p>
           <div class="card-footer">
-            <a href="${link.url}" target="_blank" class="badge" style="text-decoration: none;">Open Link ↗</a>
+            <a href="${link.url}" target="_blank" class="badge" style="text-decoration: none;">Open ↗</a>
             <div style="display: flex; gap: 8px;">
               <button class="btn-edit" onclick="editLink(${link.id})">Edit</button>
               <button class="btn-delete" onclick="deleteLink(${link.id})">Delete</button>
@@ -398,7 +410,7 @@ function renderMedia() {
       ${data.resource_media.map(media => `
         <div class="item-card">
           <h3>${media.filename || 'Untitled'}</h3>
-          <p class="meta">${media.media_type || 'Unknown'} • ${media.storage_location || 'Unknown'}</p>
+          <p class="meta">${media.media_type || 'Unknown'}</p>
           <p class="description">${media.description || 'No description'}</p>
           <div class="card-footer">
             <span class="badge">${media.file_size_kb || 'N/A'} KB</span>
@@ -453,38 +465,68 @@ function renderCookbooks() {
 }
 
 // ============================================================================
-// Modal Functions
+// Modal Functions - RECIPES (WITH ENHANCED FIELDS)
 // ============================================================================
 
 function openRecipeModal(id = null) {
   currentEditingId = id;
   const recipe = id ? data.recipes.find(r => r.id === id) : {};
+  const tagsDisplay = recipe.tags && Array.isArray(recipe.tags) ? recipe.tags.join(', ') : (recipe.tags || '');
   
   const modal = `
     <div class="modal-overlay" onclick="closeModal(event)">
-      <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal modal-large" onclick="event.stopPropagation()">
         <span class="modal-close" onclick="closeModal()">×</span>
         <h2>${id ? 'Edit Recipe' : 'Add Recipe'}</h2>
         <form onsubmit="saveRecipe(event)">
-          <input type="text" placeholder="Recipe Title" value="${recipe.title || ''}" required>
-          <textarea placeholder="Description">${recipe.description || ''}</textarea>
-          <input type="text" placeholder="Cuisine" value="${recipe.cuisine || ''}">
-          <select>
-            <option value="">Select Difficulty</option>
-            <option value="Beginner" ${recipe.difficulty_level === 'Beginner' ? 'selected' : ''}>Beginner</option>
-            <option value="Intermediate" ${recipe.difficulty_level === 'Intermediate' ? 'selected' : ''}>Intermediate</option>
-            <option value="Advanced" ${recipe.difficulty_level === 'Advanced' ? 'selected' : ''}>Advanced</option>
-          </select>
-          <input type="number" placeholder="Prep Time (minutes)" value="${recipe.prep_time_minutes || ''}">
-          <input type="number" placeholder="Cook Time (minutes)" value="${recipe.cook_time_minutes || ''}">
-          <textarea placeholder="Instructions">${recipe.instructions || ''}</textarea>
-          <button type="submit">${id ? 'Update' : 'Create'} Recipe</button>
+          <div class="form-row">
+            <input type="text" placeholder="Recipe Title *" value="${recipe.title || ''}" required>
+            <input type="text" placeholder="Cuisine (Italian, Asian, French)" value="${recipe.cuisine || ''}">
+          </div>
+
+          <div class="form-row">
+            <input type="text" placeholder="Category (Soups, Pasta, Desserts)" value="${recipe.category || ''}">
+            <select>
+              <option value="">Select Difficulty</option>
+              <option value="Beginner" ${recipe.difficulty_level === 'Beginner' ? 'selected' : ''}>Beginner</option>
+              <option value="Intermediate" ${recipe.difficulty_level === 'Intermediate' ? 'selected' : ''}>Intermediate</option>
+              <option value="Advanced" ${recipe.difficulty_level === 'Advanced' ? 'selected' : ''}>Advanced</option>
+            </select>
+          </div>
+
+          <textarea placeholder="Description" style="min-height: 80px;">${recipe.description || ''}</textarea>
+
+          <div class="form-row">
+            <input type="number" placeholder="Yield Amount" value="${recipe.yield_amount || ''}" min="1">
+            <input type="text" placeholder="Unit (Servings, Portions)" value="${recipe.yield_unit || ''}">
+          </div>
+
+          <div class="form-row">
+            <input type="number" placeholder="Prep Time (minutes)" value="${recipe.prep_time_minutes || ''}" min="0">
+            <input type="number" placeholder="Cook Time (minutes)" value="${recipe.cook_time_minutes || ''}" min="0">
+          </div>
+
+          <textarea placeholder="Ingredients (one per line)&#10;e.g. 2 cups flour, 1 egg, 1 cup milk" style="min-height: 120px;">${recipe.ingredients || ''}</textarea>
+
+          <textarea placeholder="Method / Instructions (step by step)" style="min-height: 120px;">${recipe.instructions || ''}</textarea>
+
+          <textarea placeholder="Serving Suggestions (e.g., Serve hot with rice, Garnish with herbs)" style="min-height: 100px;">${recipe.serving_suggestions || ''}</textarea>
+
+          <textarea placeholder="Tags (comma-separated: Classic, Indian-Inspired, Vegetarian)" style="min-height: 80px;">${tagsDisplay}</textarea>
+
+          <textarea placeholder="Notes (Tips, substitutions, storage)" style="min-height: 100px;">${recipe.notes || ''}</textarea>
+
+          <button type="submit" style="margin-top: 20px;">${id ? 'Update' : 'Create'} Recipe</button>
         </form>
       </div>
     </div>
   `;
   document.body.insertAdjacentHTML('beforeend', modal);
 }
+
+// ============================================================================
+// Modal Functions - OTHER SECTIONS
+// ============================================================================
 
 function openSOPModal(id = null) {
   currentEditingId = id;
@@ -572,7 +614,7 @@ function openVideoModal(id = null) {
         <form onsubmit="saveVideo(event)">
           <input type="text" placeholder="Video Title" value="${video.title || ''}" required>
           <input type="url" placeholder="Video URL" value="${video.url || ''}" required>
-          <input type="text" placeholder="Platform (YouTube, Vimeo, etc)" value="${video.platform || ''}">
+          <input type="text" placeholder="Platform (YouTube, Vimeo)" value="${video.platform || ''}">
           <input type="text" placeholder="Channel Name" value="${video.channel_name || ''}">
           <textarea placeholder="Description">${video.description || ''}</textarea>
           <button type="submit">${id ? 'Update' : 'Create'} Video</button>
@@ -671,14 +713,24 @@ async function saveRecipe(event) {
   const form = event.target;
   const inputs = form.querySelectorAll('input, textarea, select');
   
+  const tagsString = inputs[11].value;
+  const tags = tagsString ? tagsString.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
+  
   const recipe = {
     title: inputs[0].value,
-    description: inputs[1].value,
-    cuisine: inputs[2].value,
+    cuisine: inputs[1].value,
+    category: inputs[2].value,
     difficulty_level: inputs[3].value,
-    prep_time_minutes: parseInt(inputs[4].value) || 0,
-    cook_time_minutes: parseInt(inputs[5].value) || 0,
-    instructions: inputs[6].value,
+    description: inputs[4].value,
+    yield_amount: parseInt(inputs[5].value) || null,
+    yield_unit: inputs[6].value,
+    prep_time_minutes: parseInt(inputs[7].value) || 0,
+    cook_time_minutes: parseInt(inputs[8].value) || 0,
+    ingredients: inputs[9].value,
+    instructions: inputs[10].value,
+    serving_suggestions: inputs[12].value,
+    tags: tags,
+    notes: inputs[13].value,
   };
 
   if (currentEditingId) {
@@ -932,15 +984,9 @@ function editMedia(id) { openMediaModal(id); }
 function editCookbook(id) { openCookbookModal(id); }
 
 // ============================================================================
-// Initialization
+// Make functions global
 // ============================================================================
 
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('App initialized');
-  loadAllData();
-});
-
-// Make functions global so they can be called from HTML
 window.switchView = switchView;
 window.openRecipeModal = openRecipeModal;
 window.openSOPModal = openSOPModal;
@@ -975,3 +1021,12 @@ window.saveVideo = saveVideo;
 window.saveLink = saveLink;
 window.saveMedia = saveMedia;
 window.saveCookbook = saveCookbook;
+
+// ============================================================================
+// Initialize
+// ============================================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('Kitchen Database App Loaded');
+  loadAllData();
+});
