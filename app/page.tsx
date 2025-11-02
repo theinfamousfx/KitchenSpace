@@ -107,13 +107,13 @@ export default function Home() {
   };
 
   // Handle number input
-  const handleNumberInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value ? parseInt(value) : 0,
-    }));
-  };
+const handleNumberInput = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const { name, value } = e.target;
+  setFormData((prev) => ({
+    ...prev,
+    [name]: value ? parseInt(value) : 0,
+  }));
+};
 
   // Submit form
   const handleSubmit = (e: React.FormEvent) => {
