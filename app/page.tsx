@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import './styles/kitchen.css';
+import { useState, useEffect } from 'react';
+import './page.css';
 
 type ItemRecord = Record<string, any>;
 
@@ -80,6 +80,7 @@ export default function KitchenDatabase() {
 
     const actualType = typeMap[type];
     const item = data[actualType]?.find((i: ItemRecord) => i.id === id);
+    
     setFormType(type);
     setEditingItem(item || null);
     setIsFormOpen(true);
@@ -501,7 +502,16 @@ interface FormPanelProps {
 }
 
 function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
-  const [formData, setFormData] = useState<FormData>(item || {});
+  const [formData, setFormData] = useState<FormData>({});
+
+  // 🔥 FIX: Update form data when item changes
+  useEffect(() => {
+    if (item) {
+      setFormData(item);
+    } else {
+      setFormData({});
+    }
+  }, [item]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
