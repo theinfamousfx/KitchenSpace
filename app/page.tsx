@@ -187,7 +187,7 @@ export default function KitchenDatabase() {
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'translateY(-8px)';
-              e.currentTarget.style.borderColor = '#21808D';
+              e.currentTarget.style.borderColor = '#B38580';
               e.currentTarget.style.boxShadow = '0 8px 24px rgba(33, 128, 141, 0.15)';
             }}
             onMouseLeave={(e) => {
@@ -197,7 +197,7 @@ export default function KitchenDatabase() {
             }}
           >
             <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>{item.icon}</div>
-            <h3 style={{ margin: '0 0 8px 0', color: '#21808D', fontSize: '1.2rem', fontWeight: 600 }}>
+            <h3 style={{ margin: '0 0 8px 0', color: '#B38580', fontSize: '1.2rem', fontWeight: 600 }}>
               {item.title}
             </h3>
             <p style={{ margin: 0, color: '#999', fontSize: '1.1rem', fontWeight: 500 }}>
@@ -225,7 +225,7 @@ export default function KitchenDatabase() {
         <button
           onClick={() => openAddForm(type)}
           style={{
-            background: '#21808D',
+            background: '#B38580',
             color: 'white',
             border: 'none',
             padding: '12px 24px',
@@ -241,7 +241,7 @@ export default function KitchenDatabase() {
             e.currentTarget.style.boxShadow = '0 4px 12px rgba(33, 128, 141, 0.3)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = '#21808D';
+            e.currentTarget.style.background = '#B38580';
             e.currentTarget.style.transform = 'translateY(0)';
             e.currentTarget.style.boxShadow = 'none';
           }}
@@ -282,7 +282,7 @@ export default function KitchenDatabase() {
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
-              <h3 style={{ margin: '0 0 8px 0', color: '#21808D', fontSize: '1.15rem', fontWeight: 600 }}>
+              <h3 style={{ margin: '0 0 8px 0', color: '#B38580', fontSize: '1.15rem', fontWeight: 600 }}>
                 {item.title}
               </h3>
               <p style={{ color: '#999', fontSize: '0.85rem', margin: '0 0 12px 0' }}>
@@ -386,7 +386,7 @@ export default function KitchenDatabase() {
       {/* Header */}
       <header
         style={{
-          background: 'linear-gradient(135deg, #21808D 0%, #1D7480 100%)',
+          background: 'linear-gradient(135deg, #B38580 0%, #1D7480 100%)',
           color: 'white',
           padding: '24px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
@@ -437,8 +437,8 @@ export default function KitchenDatabase() {
                   padding: '16px 20px',
                   border: 'none',
                   background: currentView === tab.id ? 'white' : 'transparent',
-                  color: currentView === tab.id ? '#21808D' : '#666',
-                  borderBottom: currentView === tab.id ? '3px solid #21808D' : '3px solid transparent',
+                  color: currentView === tab.id ? '#B38580' : '#666',
+                  borderBottom: currentView === tab.id ? '3px solid #B38580' : '3px solid transparent',
                   cursor: 'pointer',
                   fontSize: '0.95rem',
                   fontWeight: currentView === tab.id ? 600 : 500,
@@ -447,7 +447,7 @@ export default function KitchenDatabase() {
                 }}
                 onMouseEnter={(e) => {
                   if (currentView !== tab.id) {
-                    e.currentTarget.style.color = '#21808D';
+                    e.currentTarget.style.color = '#B38580';
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -480,7 +480,7 @@ export default function KitchenDatabase() {
       {/* Footer */}
       <footer
         style={{
-          background: '#21808D',
+          background: '#B38580',
           color: 'white',
           textAlign: 'center',
           padding: '24px',
@@ -568,7 +568,7 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '24px',
-            background: 'linear-gradient(135deg, #21808D 0%, #1D7480 100%)',
+            background: 'linear-gradient(135deg, #B38580 0%, #1D7480 100%)',
             color: 'white',
             flexShrink: 0,
           }}
@@ -634,7 +634,7 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
                 transition: 'all 0.3s',
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#21808D';
+                e.currentTarget.style.borderColor = '#B38580';
                 e.currentTarget.style.background = 'white';
               }}
               onBlur={(e) => {
@@ -666,7 +666,7 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
                 transition: 'all 0.3s',
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#21808D';
+                e.currentTarget.style.borderColor = '#B38580';
                 e.currentTarget.style.background = 'white';
               }}
               onBlur={(e) => {
@@ -699,7 +699,7 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
                 transition: 'all 0.3s',
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#21808D';
+                e.currentTarget.style.borderColor = '#B38580';
                 e.currentTarget.style.background = 'white';
               }}
               onBlur={(e) => {
@@ -732,7 +732,7 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
                 transition: 'all 0.3s',
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#21808D';
+                e.currentTarget.style.borderColor = '#B38580';
                 e.currentTarget.style.background = 'white';
               }}
               onBlur={(e) => {
@@ -749,7 +749,7 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
               style={{
                 flex: 1,
                 padding: '12px',
-                background: '#21808D',
+                background: '#B38580',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
@@ -762,7 +762,7 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
                 e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#21808D';
+                e.currentTarget.style.background = '#B38580';
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
