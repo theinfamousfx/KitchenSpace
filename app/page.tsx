@@ -107,13 +107,13 @@ export default function Home() {
   };
 
   // Handle number input
-const handleNumberInput = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-  const { name, value } = e.target;
-  setFormData((prev) => ({
-    ...prev,
-    [name]: value ? parseInt(value) : 0,
-  }));
-};
+  const handleNumberInput = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value ? parseInt(value) : 0,
+    }));
+  };
 
   // Submit form
   const handleSubmit = (e: React.FormEvent) => {
@@ -364,12 +364,25 @@ const handleNumberInput = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectEle
     }
   };
 
+  // Dashboard button handler
+  const handleDashboardClick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <main className="kitchen-container">
-      {/* Header */}
-      <header className="kitchen-header">
-        <h1>🍳 Kitchen Database</h1>
-        <p>Organize your culinary knowledge, recipes, and techniques in one professional system</p>
+      {/* PERSISTENT STICKY HEADER */}
+      <header className="sticky-header">
+        <div className="header-content">
+          <div className="header-left">
+            <h1>🍳 Kitchen Database</h1>
+          </div>
+          <div className="header-right">
+            <button className="btn-dashboard" onClick={handleDashboardClick}>
+              Dashboard
+            </button>
+          </div>
+        </div>
       </header>
 
       {/* Overlay for panel */}
@@ -411,137 +424,145 @@ const handleNumberInput = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectEle
         </form>
       </div>
 
-      {/* Sections */}
-      <section className="section recipes-section">
-        <div className="section-header">
-          <h2>📖 Recipes</h2>
-          <button className="btn-add" onClick={() => handleAddClick('Recipes')}>
-            + Add Recipe
-          </button>
-        </div>
-        <div className="items-grid">
-          {recipes.length === 0 ? (
-            <p className="empty-state">No recipes yet. Add one to get started!</p>
-          ) : (
-            recipes.map((recipe) => (
-              <div key={recipe.id} className="item-card">
-                <h3>{recipe.title}</h3>
-                <p><strong>Cuisine:</strong> {recipe.cuisine}</p>
-                <p><strong>Difficulty:</strong> {recipe.difficulty}</p>
-                <p><strong>Servings:</strong> {recipe.servings}</p>
-              </div>
-            ))
-          )}
-        </div>
-      </section>
+      {/* MAIN CONTENT */}
+      <div className="main-content">
+        {/* Recipes Section */}
+        <section className="section recipes-section">
+          <div className="section-header">
+            <h2>📖 Recipes</h2>
+            <button className="btn-add" onClick={() => handleAddClick('Recipes')}>
+              + Add Recipe
+            </button>
+          </div>
+          <div className="items-grid">
+            {recipes.length === 0 ? (
+              <p className="empty-state">No recipes yet. Add one to get started!</p>
+            ) : (
+              recipes.map((recipe) => (
+                <div key={recipe.id} className="item-card">
+                  <h3>{recipe.title}</h3>
+                  <p><strong>Cuisine:</strong> {recipe.cuisine}</p>
+                  <p><strong>Difficulty:</strong> {recipe.difficulty}</p>
+                  <p><strong>Servings:</strong> {recipe.servings}</p>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
 
-      <section className="section sops-section">
-        <div className="section-header">
-          <h2>⚙️ SOPs</h2>
-          <button className="btn-add" onClick={() => handleAddClick('SOPs')}>
-            + Add SOP
-          </button>
-        </div>
-        <div className="items-grid">
-          {sops.length === 0 ? (
-            <p className="empty-state">No SOPs yet. Add one to get started!</p>
-          ) : (
-            sops.map((sop) => (
-              <div key={sop.id} className="item-card">
-                <h3>{sop.title}</h3>
-                <p><strong>Category:</strong> {sop.category}</p>
-                <p><strong>Priority:</strong> {sop.priority}</p>
-              </div>
-            ))
-          )}
-        </div>
-      </section>
+        {/* SOPs Section */}
+        <section className="section sops-section">
+          <div className="section-header">
+            <h2>⚙️ SOPs</h2>
+            <button className="btn-add" onClick={() => handleAddClick('SOPs')}>
+              + Add SOP
+            </button>
+          </div>
+          <div className="items-grid">
+            {sops.length === 0 ? (
+              <p className="empty-state">No SOPs yet. Add one to get started!</p>
+            ) : (
+              sops.map((sop) => (
+                <div key={sop.id} className="item-card">
+                  <h3>{sop.title}</h3>
+                  <p><strong>Category:</strong> {sop.category}</p>
+                  <p><strong>Priority:</strong> {sop.priority}</p>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
 
-      <section className="section techniques-section">
-        <div className="section-header">
-          <h2>🎯 Techniques</h2>
-          <button className="btn-add" onClick={() => handleAddClick('Techniques')}>
-            + Add Technique
-          </button>
-        </div>
-        <div className="items-grid">
-          {techniques.length === 0 ? (
-            <p className="empty-state">No techniques yet. Add one to get started!</p>
-          ) : (
-            techniques.map((technique) => (
-              <div key={technique.id} className="item-card">
-                <h3>{technique.title}</h3>
-                <p>{technique.description}</p>
-              </div>
-            ))
-          )}
-        </div>
-      </section>
+        {/* Techniques Section */}
+        <section className="section techniques-section">
+          <div className="section-header">
+            <h2>🎯 Techniques</h2>
+            <button className="btn-add" onClick={() => handleAddClick('Techniques')}>
+              + Add Technique
+            </button>
+          </div>
+          <div className="items-grid">
+            {techniques.length === 0 ? (
+              <p className="empty-state">No techniques yet. Add one to get started!</p>
+            ) : (
+              techniques.map((technique) => (
+                <div key={technique.id} className="item-card">
+                  <h3>{technique.title}</h3>
+                  <p>{technique.description}</p>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
 
-      <section className="section notes-section">
-        <div className="section-header">
-          <h2>📝 Notes</h2>
-          <button className="btn-add" onClick={() => handleAddClick('Notes')}>
-            + Add Note
-          </button>
-        </div>
-        <div className="items-grid">
-          {notes.length === 0 ? (
-            <p className="empty-state">No notes yet. Add one to get started!</p>
-          ) : (
-            notes.map((note) => (
-              <div key={note.id} className="item-card">
-                <h3>{note.title}</h3>
-                <p><strong>Category:</strong> {note.category}</p>
-              </div>
-            ))
-          )}
-        </div>
-      </section>
+        {/* Notes Section */}
+        <section className="section notes-section">
+          <div className="section-header">
+            <h2>📝 Notes</h2>
+            <button className="btn-add" onClick={() => handleAddClick('Notes')}>
+              + Add Note
+            </button>
+          </div>
+          <div className="items-grid">
+            {notes.length === 0 ? (
+              <p className="empty-state">No notes yet. Add one to get started!</p>
+            ) : (
+              notes.map((note) => (
+                <div key={note.id} className="item-card">
+                  <h3>{note.title}</h3>
+                  <p><strong>Category:</strong> {note.category}</p>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
 
-      <section className="section resources-section">
-        <div className="section-header">
-          <h2>🔗 Resources</h2>
-          <button className="btn-add" onClick={() => handleAddClick('Resources')}>
-            + Add Resource
-          </button>
-        </div>
-        <div className="items-grid">
-          {resources.length === 0 ? (
-            <p className="empty-state">No resources yet. Add one to get started!</p>
-          ) : (
-            resources.map((resource) => (
-              <div key={resource.id} className="item-card">
-                <h3>{resource.title}</h3>
-                <p><strong>Type:</strong> {resource.type}</p>
-              </div>
-            ))
-          )}
-        </div>
-      </section>
+        {/* Resources Section */}
+        <section className="section resources-section">
+          <div className="section-header">
+            <h2>🔗 Resources</h2>
+            <button className="btn-add" onClick={() => handleAddClick('Resources')}>
+              + Add Resource
+            </button>
+          </div>
+          <div className="items-grid">
+            {resources.length === 0 ? (
+              <p className="empty-state">No resources yet. Add one to get started!</p>
+            ) : (
+              resources.map((resource) => (
+                <div key={resource.id} className="item-card">
+                  <h3>{resource.title}</h3>
+                  <p><strong>Type:</strong> {resource.type}</p>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
 
-      <section className="section cookbooks-section">
-        <div className="section-header">
-          <h2>📚 Cookbooks</h2>
-          <button className="btn-add" onClick={() => handleAddClick('Cookbooks')}>
-            + Add Cookbook
-          </button>
-        </div>
-        <div className="items-grid">
-          {cookbooks.length === 0 ? (
-            <p className="empty-state">No cookbooks yet. Add one to get started!</p>
-          ) : (
-            cookbooks.map((cookbook) => (
-              <div key={cookbook.id} className="item-card">
-                <h3>{cookbook.title}</h3>
-                <p><strong>Author:</strong> {cookbook.author}</p>
-                <p><strong>Cuisine:</strong> {cookbook.cuisine}</p>
-                <p><strong>Rating:</strong> {'⭐'.repeat(cookbook.rating)}</p>
-              </div>
-            ))
-          )}
-        </div>
-      </section>
+        {/* Cookbooks Section */}
+        <section className="section cookbooks-section">
+          <div className="section-header">
+            <h2>📚 Cookbooks</h2>
+            <button className="btn-add" onClick={() => handleAddClick('Cookbooks')}>
+              + Add Cookbook
+            </button>
+          </div>
+          <div className="items-grid">
+            {cookbooks.length === 0 ? (
+              <p className="empty-state">No cookbooks yet. Add one to get started!</p>
+            ) : (
+              cookbooks.map((cookbook) => (
+                <div key={cookbook.id} className="item-card">
+                  <h3>{cookbook.title}</h3>
+                  <p><strong>Author:</strong> {cookbook.author}</p>
+                  <p><strong>Cuisine:</strong> {cookbook.cuisine}</p>
+                  <p><strong>Rating:</strong> {'⭐'.repeat(cookbook.rating)}</p>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
