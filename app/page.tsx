@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import './page.css';
+import './styles/kitchen.css';
 
 type ItemRecord = Record<string, any>;
 
