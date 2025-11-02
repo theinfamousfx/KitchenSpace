@@ -9,7 +9,7 @@ interface FormData {
   [key: string]: string;
 }
 
-// Color Palette
+// Color Palette - All Solid
 const colors = {
   primary: '#0492C2',      // Bright Blue
   accent: '#FAEFDA',       // Cream White
@@ -199,12 +199,10 @@ export default function KitchenDatabase() {
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'translateY(-8px)';
-              e.currentTarget.style.borderColor = colors.primary;
-              e.currentTarget.style.boxShadow = `0 12px 28px ${colors.primary}20`;
+              e.currentTarget.style.boxShadow = '0 12px 28px rgba(0,0,0,0.15)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.borderColor = colors.medium;
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
             }}
           >
@@ -246,15 +244,15 @@ export default function KitchenDatabase() {
             fontSize: '0.95rem',
             fontWeight: 600,
             transition: 'all 0.3s ease',
-            boxShadow: `0 4px 12px ${colors.primary}30`,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'translateY(-3px)';
-            e.currentTarget.style.boxShadow = `0 8px 20px ${colors.primary}50`;
+            e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.2)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = `0 4px 12px ${colors.primary}30`;
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
           }}
         >
           + Add {title.slice(0, -1)}
@@ -285,7 +283,7 @@ export default function KitchenDatabase() {
                 transition: 'all 0.3s ease',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = `0 8px 20px ${colors.primary}20`;
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.12)';
                 e.currentTarget.style.transform = 'translateY(-4px)';
               }}
               onMouseLeave={(e) => {
@@ -401,10 +399,10 @@ export default function KitchenDatabase() {
       {/* Header */}
       <header
         style={{
-          background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.dark} 100%)`,
+          background: colors.primary,
           color: colors.lightText,
           padding: '24px',
-          boxShadow: `0 4px 16px ${colors.primary}30`,
+          boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
           position: 'sticky',
           top: 0,
           zIndex: 100,
@@ -425,7 +423,7 @@ export default function KitchenDatabase() {
                 borderRadius: '8px',
                 width: '250px',
                 fontSize: '14px',
-                background: `${colors.accent}80`,
+                background: colors.accent,
                 color: colors.text,
               }}
             />
@@ -497,7 +495,7 @@ export default function KitchenDatabase() {
       {/* Footer */}
       <footer
         style={{
-          background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.dark} 100%)`,
+          background: colors.primary,
           color: colors.lightText,
           textAlign: 'center',
           padding: '24px',
@@ -568,7 +566,7 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
           width: '100%',
           maxWidth: '480px',
           background: colors.accent,
-          boxShadow: `-4px 0 16px ${colors.primary}30`,
+          boxShadow: '0 0 16px rgba(0,0,0,0.15)',
           transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
           transition: 'transform 0.3s ease',
           zIndex: 1000,
@@ -584,7 +582,7 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '24px',
-            background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.dark} 100%)`,
+            background: colors.primary,
             color: colors.lightText,
             flexShrink: 0,
           }}
@@ -651,7 +649,7 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = colors.primary;
-                e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary}15`;
+                e.currentTarget.style.boxShadow = `0 0 0 3px rgba(4, 146, 194, 0.15)`;
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = colors.medium;
@@ -683,7 +681,7 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = colors.primary;
-                e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary}15`;
+                e.currentTarget.style.boxShadow = `0 0 0 3px rgba(4, 146, 194, 0.15)`;
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = colors.medium;
@@ -716,7 +714,7 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = colors.primary;
-                e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary}15`;
+                e.currentTarget.style.boxShadow = `0 0 0 3px rgba(4, 146, 194, 0.15)`;
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = colors.medium;
@@ -749,7 +747,7 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = colors.primary;
-                e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary}15`;
+                e.currentTarget.style.boxShadow = `0 0 0 3px rgba(4, 146, 194, 0.15)`;
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = colors.medium;
@@ -772,15 +770,15 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
                 cursor: 'pointer',
                 fontWeight: 700,
                 transition: 'all 0.3s',
-                boxShadow: `0 4px 12px ${colors.primary}30`,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = `0 8px 20px ${colors.primary}50`;
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.2)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = `0 4px 12px ${colors.primary}30`;
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
               }}
             >
               Save
