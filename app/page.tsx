@@ -1,13 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import './styles/kitchen.css';
+import './page.css';
 
-interface Item {
-  id: number;
-  title: string;
-  [key: string]: any;
-}
+type ItemRecord = Record<string, any>;
 
 interface FormData {
   [key: string]: string;
@@ -17,9 +13,9 @@ export default function KitchenDatabase() {
   const [currentView, setCurrentView] = useState<string>('dashboard');
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [formType, setFormType] = useState<string>('');
-  const [editingItem, setEditingItem] = useState<Item | null>(null);
+  const [editingItem, setEditingItem] = useState<ItemRecord | null>(null);
 
-  const [data, setData] = useState({
+  const [data, setData] = useState<Record<string, ItemRecord[]>>({
     recipes: [
       {
         id: 1,
@@ -45,15 +41,15 @@ export default function KitchenDatabase() {
         compliancenotes: 'Temperature logs required before service',
       },
     ],
-    techniques: [] as Item[],
-    notes: [] as Item[],
-    videos: [] as Item[],
-    links: [] as Item[],
-    media: [] as Item[],
-    cookbooks: [] as Item[],
+    techniques: [],
+    notes: [],
+    videos: [],
+    links: [],
+    media: [],
+    cookbooks: [],
   });
 
-  const [nextIds, setNextIds] = useState({
+  const [nextIds, setNextIds] = useState<Record<string, number>>({
     recipes: 2,
     sops: 2,
     techniques: 1,
@@ -73,7 +69,7 @@ export default function KitchenDatabase() {
 
   // Open form for editing
   const openEditForm = (type: string, id: number) => {
-    const typeMap: { [key: string]: keyof typeof data } = {
+    const typeMap: Record<string, string> = {
       recipe: 'recipes',
       sop: 'sops',
       technique: 'techniques',
@@ -85,7 +81,7 @@ export default function KitchenDatabase() {
     };
 
     const actualType = typeMap[type];
-    const item = data[actualType].find((i: Item) => i.id === id);
+    const item = data[actualType]?.find((i: ItemRecord) => i.id === id);
 
     setFormType(type);
     setEditingItem(item || null);
@@ -101,7 +97,7 @@ export default function KitchenDatabase() {
 
   // Save item
   const saveItem = (formData: FormData) => {
-    const typeMap: { [key: string]: keyof typeof data } = {
+    const typeMap: Record<string, string> = {
       recipe: 'recipes',
       sop: 'sops',
       technique: 'techniques',
@@ -118,7 +114,7 @@ export default function KitchenDatabase() {
       const newData = { ...prevData };
 
       if (editingItem) {
-        const index = newData[actualType].findIndex((i: Item) => i.id === editingItem.id);
+        const index = newData[actualType].findIndex((i: ItemRecord) => i.id === editingItem.id);
         if (index !== -1) {
           newData[actualType][index] = {
             ...newData[actualType][index],
@@ -126,14 +122,15 @@ export default function KitchenDatabase() {
           };
         }
       } else {
-        newData[actualType].push({
-          id: nextIds[actualType as keyof typeof nextIds],
+        const newItem: ItemRecord = {
+          id: nextIds[actualType] || 1,
           ...formData,
-        });
+        };
+        newData[actualType].push(newItem);
 
         setNextIds((prev) => ({
           ...prev,
-          [actualType]: prev[actualType as keyof typeof prev] + 1,
+          [actualType]: (prev[actualType] || 0) + 1,
         }));
       }
 
@@ -144,11 +141,11 @@ export default function KitchenDatabase() {
   };
 
   // Delete item
-  const deleteItem = (section: keyof typeof data, id: number) => {
+  const deleteItem = (section: string, id: number) => {
     if (confirm('Delete this item?')) {
       setData((prevData) => ({
         ...prevData,
-        [section]: prevData[section].filter((item: Item) => item.id !== id),
+        [section]: prevData[section].filter((item: ItemRecord) => item.id !== id),
       }));
     }
   };
@@ -195,7 +192,7 @@ export default function KitchenDatabase() {
   );
 
   // Render items list
-  const renderItems = (section: keyof typeof data, title: string, type: string) => (
+  const renderItems = (section: string, title: string, type: string) => (
     <div className="content-section">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <h2>{title}</h2>
@@ -204,19 +201,22 @@ export default function KitchenDatabase() {
         </button>
       </div>
 
-      {data[section].length === 0 ? (
+      {!data[section] || data[section].length === 0 ? (
         <p style={{ textAlign: 'center', color: '#999', padding: '40px 0' }}>No items yet. Click the button to add one!</p>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
-          {data[section].map((item: Item) => (
-            <div key={item.id} style={{
-              border: '1px solid #e0e0e0',
-              borderRadius: '8px',
-              padding: '16px',
-              backgroundColor: '#f9f9f9',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-              transition: 'all 0.3s'
-            }}>
+          {data[section].map((item: ItemRecord) => (
+            <div
+              key={item.id}
+              style={{
+                border: '1px solid #e0e0e0',
+                borderRadius: '8px',
+                padding: '16px',
+                backgroundColor: '#f9f9f9',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                transition: 'all 0.3s',
+              }}
+            >
               <h3 style={{ margin: '0 0 8px 0', color: '#2C3E50' }}>{item.title}</h3>
               <p style={{ color: '#999', fontSize: '0.85rem', margin: '0 0 8px 0' }}>
                 {item.category || item.cuisine || 'General'}
@@ -376,7 +376,7 @@ export default function KitchenDatabase() {
 interface FormPanelProps {
   isOpen: boolean;
   type: string;
-  item: Item | null;
+  item: ItemRecord | null;
   onClose: () => void;
   onSave: (formData: FormData) => void;
 }
