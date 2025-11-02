@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import './page.css';
+import './styles/kitchen.css';
 
 interface Item {
   id: number;
