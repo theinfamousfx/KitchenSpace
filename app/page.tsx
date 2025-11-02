@@ -11,7 +11,7 @@ interface FormData {
 
 // Color Palette - All Solid
 const colors = {
-  primary: '#A08A61',      // Bright Blue
+  primary: '#0492C2',      // Bright Blue
   accent: '#FAEFDA',       // Cream White
   light: '#F0CF92',        // Light Tan (Background)
   medium: '#BFB195',       // Medium Tan
@@ -21,38 +21,75 @@ const colors = {
   danger: '#E74C3C',       // Red
 };
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+
+// API Service Functions
+const api = {
+  async fetchItems(type: string) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/${type}`);
+      if (!response.ok) throw new Error(`Failed to fetch ${type}`);
+      return await response.json();
+    } catch (error) {
+      console.error(`Error fetching ${type}:`, error);
+      return [];
+    }
+  },
+
+  async createItem(type: string, data: ItemRecord) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/${type}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error(`Failed to create ${type}`);
+      return await response.json();
+    } catch (error) {
+      console.error(`Error creating ${type}:`, error);
+      throw error;
+    }
+  },
+
+  async updateItem(type: string, id: number, data: ItemRecord) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/${type}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error(`Failed to update ${type}`);
+      return await response.json();
+    } catch (error) {
+      console.error(`Error updating ${type}:`, error);
+      throw error;
+    }
+  },
+
+  async deleteItem(type: string, id: number) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/${type}/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error(`Failed to delete ${type}`);
+      return await response.json();
+    } catch (error) {
+      console.error(`Error deleting ${type}:`, error);
+      throw error;
+    }
+  },
+};
+
 export default function KitchenDatabase() {
   const [currentView, setCurrentView] = useState<string>('dashboard');
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [formType, setFormType] = useState<string>('');
   const [editingItem, setEditingItem] = useState<ItemRecord | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [data, setData] = useState<Record<string, ItemRecord[]>>({
-    recipes: [
-      {
-        id: 1,
-        title: 'Chocolate Soufflé',
-        cuisine: 'French',
-        difficulty: 'Advanced',
-        servings: 6,
-        preptime: 45,
-        cooktime: 15,
-        description: 'A classic French dessert that rises magnificently.',
-        ingredients: '200g dark chocolate, 6 eggs, 75g sugar',
-        instructions: 'Mix and bake at 190°C',
-      },
-    ],
-    sops: [
-      {
-        id: 1,
-        title: 'Kitchen Opening',
-        category: 'Daily Operations',
-        priority: 'High',
-        description: 'Complete daily opening procedures',
-        steps: 'Check temps, clean equipment, prep stations',
-        compliancenotes: 'Temperature logs required before service',
-      },
-    ],
+    recipes: [],
+    sops: [],
     techniques: [],
     notes: [],
     videos: [],
@@ -61,16 +98,29 @@ export default function KitchenDatabase() {
     cookbooks: [],
   });
 
-  const [nextIds, setNextIds] = useState<Record<string, number>>({
-    recipes: 2,
-    sops: 2,
-    techniques: 1,
-    notes: 1,
-    videos: 1,
-    links: 1,
-    media: 1,
-    cookbooks: 1,
-  });
+  // Fetch all data on mount
+  useEffect(() => {
+    loadAllData();
+  }, []);
+
+  const loadAllData = async () => {
+    setLoading(true);
+    try {
+      const types = ['recipes', 'sops', 'techniques', 'notes', 'videos', 'links', 'media', 'cookbooks'];
+      const results = await Promise.all(types.map((type) => api.fetchItems(type)));
+
+      const newData: Record<string, ItemRecord[]> = {};
+      types.forEach((type, index) => {
+        newData[type] = results[index];
+      });
+
+      setData(newData);
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const openAddForm = (type: string) => {
     setFormType(type);
@@ -104,7 +154,7 @@ export default function KitchenDatabase() {
     setEditingItem(null);
   };
 
-  const saveItem = (formData: FormData) => {
+  const saveItem = async (formData: FormData) => {
     const typeMap: Record<string, string> = {
       recipe: 'recipes',
       sop: 'sops',
@@ -118,42 +168,40 @@ export default function KitchenDatabase() {
 
     const actualType = typeMap[formType];
 
-    setData((prevData) => {
-      const newData = { ...prevData };
+    try {
+      setLoading(true);
 
       if (editingItem) {
-        const index = newData[actualType].findIndex((i: ItemRecord) => i.id === editingItem.id);
-        if (index !== -1) {
-          newData[actualType][index] = {
-            ...newData[actualType][index],
-            ...formData,
-          };
-        }
+        // Update existing item
+        await api.updateItem(actualType, editingItem.id, formData);
       } else {
-        const newItem: ItemRecord = {
-          id: nextIds[actualType] || 1,
-          ...formData,
-        };
-        newData[actualType].push(newItem);
-
-        setNextIds((prev) => ({
-          ...prev,
-          [actualType]: (prev[actualType] || 0) + 1,
-        }));
+        // Create new item
+        await api.createItem(actualType, formData);
       }
 
-      return newData;
-    });
-
-    closeForm();
+      // Reload data
+      await loadAllData();
+      closeForm();
+    } catch (error) {
+      console.error('Error saving item:', error);
+      alert('Error saving item. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deleteItem = (section: string, id: number) => {
-    if (confirm('Delete this item?')) {
-      setData((prevData) => ({
-        ...prevData,
-        [section]: prevData[section].filter((item: ItemRecord) => item.id !== id),
-      }));
+  const deleteItem = async (section: string, id: number) => {
+    if (!confirm('Delete this item?')) return;
+
+    try {
+      setLoading(true);
+      await api.deleteItem(section, id);
+      await loadAllData();
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      alert('Error deleting item. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -234,36 +282,50 @@ export default function KitchenDatabase() {
         <h2 style={{ margin: 0, fontSize: '2.2rem', color: colors.primary, fontWeight: 700 }}>{title}</h2>
         <button
           onClick={() => openAddForm(type)}
+          disabled={loading}
           style={{
             background: colors.primary,
             color: colors.lightText,
             border: 'none',
             padding: '12px 28px',
             borderRadius: '10px',
-            cursor: 'pointer',
+            cursor: loading ? 'not-allowed' : 'pointer',
             fontSize: '0.95rem',
             fontWeight: 600,
             transition: 'all 0.3s ease',
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            opacity: loading ? 0.5 : 1,
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-3px)';
-            e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.2)';
+            if (!loading) {
+              e.currentTarget.style.transform = 'translateY(-3px)';
+              e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.2)';
+            }
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            if (!loading) {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }
           }}
         >
           + Add {title.slice(0, -1)}
         </button>
       </div>
 
-      {!data[section] || data[section].length === 0 ? (
+      {loading && (
+        <div style={{ textAlign: 'center', padding: '40px', color: colors.dark }}>
+          <p>Loading...</p>
+        </div>
+      )}
+
+      {!loading && (!data[section] || data[section].length === 0) && (
         <div style={{ textAlign: 'center', color: colors.dark, padding: '60px 20px' }}>
           <p style={{ fontSize: '1.1rem', margin: 0 }}>No items yet. Click the button to add one!</p>
         </div>
-      ) : (
+      )}
+
+      {!loading && data[section] && data[section].length > 0 && (
         <div
           style={{
             display: 'grid',
@@ -303,6 +365,7 @@ export default function KitchenDatabase() {
               <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
                 <button
                   onClick={() => openEditForm(type, item.id)}
+                  disabled={loading}
                   style={{
                     flex: 1,
                     padding: '8px 12px',
@@ -310,24 +373,24 @@ export default function KitchenDatabase() {
                     color: colors.lightText,
                     border: 'none',
                     borderRadius: '6px',
-                    cursor: 'pointer',
+                    cursor: loading ? 'not-allowed' : 'pointer',
                     fontSize: '0.9rem',
                     fontWeight: 600,
                     transition: 'all 0.3s ease',
+                    opacity: loading ? 0.5 : 1,
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.opacity = '0.9';
-                    e.currentTarget.style.transform = 'scale(1.02)';
+                    if (!loading) e.currentTarget.style.opacity = '0.9';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.opacity = '1';
-                    e.currentTarget.style.transform = 'scale(1)';
+                    if (!loading) e.currentTarget.style.opacity = '1';
                   }}
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => deleteItem(section, item.id)}
+                  disabled={loading}
                   style={{
                     flex: 1,
                     padding: '8px 12px',
@@ -335,18 +398,17 @@ export default function KitchenDatabase() {
                     color: colors.lightText,
                     border: 'none',
                     borderRadius: '6px',
-                    cursor: 'pointer',
+                    cursor: loading ? 'not-allowed' : 'pointer',
                     fontSize: '0.9rem',
                     fontWeight: 600,
                     transition: 'all 0.3s ease',
+                    opacity: loading ? 0.5 : 1,
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.opacity = '0.9';
-                    e.currentTarget.style.transform = 'scale(1.02)';
+                    if (!loading) e.currentTarget.style.opacity = '0.9';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.opacity = '1';
-                    e.currentTarget.style.transform = 'scale(1)';
+                    if (!loading) e.currentTarget.style.opacity = '1';
                   }}
                 >
                   Delete
