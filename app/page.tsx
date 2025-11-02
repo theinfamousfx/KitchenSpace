@@ -60,14 +60,12 @@ export default function KitchenDatabase() {
     cookbooks: 1,
   });
 
-  // Open form for adding
   const openAddForm = (type: string) => {
     setFormType(type);
     setEditingItem(null);
     setIsFormOpen(true);
   };
 
-  // Open form for editing
   const openEditForm = (type: string, id: number) => {
     const typeMap: Record<string, string> = {
       recipe: 'recipes',
@@ -82,20 +80,17 @@ export default function KitchenDatabase() {
 
     const actualType = typeMap[type];
     const item = data[actualType]?.find((i: ItemRecord) => i.id === id);
-
     setFormType(type);
     setEditingItem(item || null);
     setIsFormOpen(true);
   };
 
-  // Close form
   const closeForm = () => {
     setIsFormOpen(false);
     setFormType('');
     setEditingItem(null);
   };
 
-  // Save item
   const saveItem = (formData: FormData) => {
     const typeMap: Record<string, string> = {
       recipe: 'recipes',
@@ -140,7 +135,6 @@ export default function KitchenDatabase() {
     closeForm();
   };
 
-  // Delete item
   const deleteItem = (section: string, id: number) => {
     if (confirm('Delete this item?')) {
       setData((prevData) => ({
@@ -150,92 +144,196 @@ export default function KitchenDatabase() {
     }
   };
 
-  // Render dashboard
   const renderDashboard = () => (
-    <div className="content-section">
-      <h2>📊 Dashboard</h2>
-      <div className="stats-grid">
-        <div className="stat-card" onClick={() => setCurrentView('recipes')} style={{ cursor: 'pointer' }}>
-          <h3>Recipes</h3>
-          <p className="stat-number">{data.recipes.length}</p>
-        </div>
-        <div className="stat-card" onClick={() => setCurrentView('sops')} style={{ cursor: 'pointer' }}>
-          <h3>SOPs</h3>
-          <p className="stat-number">{data.sops.length}</p>
-        </div>
-        <div className="stat-card" onClick={() => setCurrentView('techniques')} style={{ cursor: 'pointer' }}>
-          <h3>Techniques</h3>
-          <p className="stat-number">{data.techniques.length}</p>
-        </div>
-        <div className="stat-card" onClick={() => setCurrentView('notes')} style={{ cursor: 'pointer' }}>
-          <h3>Notes</h3>
-          <p className="stat-number">{data.notes.length}</p>
-        </div>
-        <div className="stat-card" onClick={() => setCurrentView('videos')} style={{ cursor: 'pointer' }}>
-          <h3>Videos</h3>
-          <p className="stat-number">{data.videos.length}</p>
-        </div>
-        <div className="stat-card" onClick={() => setCurrentView('links')} style={{ cursor: 'pointer' }}>
-          <h3>Links</h3>
-          <p className="stat-number">{data.links.length}</p>
-        </div>
-        <div className="stat-card" onClick={() => setCurrentView('media')} style={{ cursor: 'pointer' }}>
-          <h3>Media</h3>
-          <p className="stat-number">{data.media.length}</p>
-        </div>
-        <div className="stat-card" onClick={() => setCurrentView('cookbooks')} style={{ cursor: 'pointer' }}>
-          <h3>Cookbooks</h3>
-          <p className="stat-number">{data.cookbooks.length}</p>
-        </div>
+    <div>
+      <h2 style={{ fontSize: '2.5rem', color: '#1A3A3F', marginBottom: '8px', fontWeight: 700 }}>
+        Welcome to Your Kitchen
+      </h2>
+      <p style={{ fontSize: '1.1rem', color: '#555', marginBottom: '40px', lineHeight: '1.6' }}>
+        Organize your culinary knowledge, recipes, and techniques in one place
+      </p>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+          gap: '20px',
+          marginTop: '30px',
+        }}
+      >
+        {[
+          { section: 'recipes', icon: '📖', title: 'Recipes' },
+          { section: 'sops', icon: '📋', title: 'SOPs' },
+          { section: 'techniques', icon: '🎯', title: 'Techniques' },
+          { section: 'notes', icon: '📝', title: 'Notes' },
+          { section: 'videos', icon: '🎬', title: 'Videos' },
+          { section: 'links', icon: '🔗', title: 'Links' },
+          { section: 'media', icon: '📁', title: 'Media' },
+          { section: 'cookbooks', icon: '📚', title: 'Cookbooks' },
+        ].map((item) => (
+          <div
+            key={item.section}
+            onClick={() => setCurrentView(item.section)}
+            style={{
+              background: 'white',
+              border: '2px solid #E8DCC4',
+              borderRadius: '12px',
+              padding: '24px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              textAlign: 'center',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-8px)';
+              e.currentTarget.style.borderColor = '#21808D';
+              e.currentTarget.style.boxShadow = '0 8px 24px rgba(33, 128, 141, 0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.borderColor = '#E8DCC4';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+            }}
+          >
+            <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>{item.icon}</div>
+            <h3 style={{ margin: '0 0 8px 0', color: '#21808D', fontSize: '1.2rem', fontWeight: 600 }}>
+              {item.title}
+            </h3>
+            <p style={{ margin: 0, color: '#999', fontSize: '1.1rem', fontWeight: 500 }}>
+              {data[item.section].length}
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   );
 
-  // Render items list
   const renderItems = (section: string, title: string, type: string) => (
-    <div className="content-section">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h2>{title}</h2>
-        <button className="btn btn-primary" onClick={() => openAddForm(type)}>
-          + Add {title.slice(0, -1)}
+    <div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '30px',
+          paddingBottom: '20px',
+          borderBottom: '2px solid #E8DCC4',
+        }}
+      >
+        <h2 style={{ margin: 0, fontSize: '2rem', color: '#1A3A3F', fontWeight: 700 }}>{title}</h2>
+        <button
+          onClick={() => openAddForm(type)}
+          style={{
+            background: '#21808D',
+            color: 'white',
+            border: 'none',
+            padding: '12px 24px',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '0.95rem',
+            fontWeight: 600,
+            transition: 'all 0.3s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = '#1D7480';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(33, 128, 141, 0.3)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = '#21808D';
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = 'none';
+          }}
+        >
+          + Add
         </button>
       </div>
 
       {!data[section] || data[section].length === 0 ? (
-        <p style={{ textAlign: 'center', color: '#999', padding: '40px 0' }}>No items yet. Click the button to add one!</p>
+        <div style={{ textAlign: 'center', color: '#999', padding: '60px 20px' }}>
+          <p style={{ fontSize: '1.1rem', margin: 0 }}>No items yet. Click the button to add one!</p>
+        </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+            gap: '20px',
+          }}
+        >
           {data[section].map((item: ItemRecord) => (
             <div
               key={item.id}
               style={{
-                border: '1px solid #e0e0e0',
-                borderRadius: '8px',
-                padding: '16px',
-                backgroundColor: '#f9f9f9',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-                transition: 'all 0.3s',
+                background: 'white',
+                border: '1px solid #E8DCC4',
+                borderRadius: '12px',
+                padding: '20px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                transition: 'all 0.3s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.1)';
+                e.currentTarget.style.transform = 'translateY(-4px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+                e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
-              <h3 style={{ margin: '0 0 8px 0', color: '#2C3E50' }}>{item.title}</h3>
-              <p style={{ color: '#999', fontSize: '0.85rem', margin: '0 0 8px 0' }}>
+              <h3 style={{ margin: '0 0 8px 0', color: '#21808D', fontSize: '1.15rem', fontWeight: 600 }}>
+                {item.title}
+              </h3>
+              <p style={{ color: '#999', fontSize: '0.85rem', margin: '0 0 12px 0' }}>
                 {item.category || item.cuisine || 'General'}
               </p>
-              <p style={{ color: '#666', margin: '8px 0', minHeight: '40px' }}>
+              <p style={{ color: '#666', margin: '12px 0', minHeight: '50px', lineHeight: '1.5' }}>
                 {item.description || 'No description'}
               </p>
-              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
                 <button
-                  className="btn"
-                  style={{ backgroundColor: '#2196f3', color: 'white', padding: '8px 12px', flex: 1 }}
                   onClick={() => openEditForm(type, item.id)}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    background: '#2196f3',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    fontWeight: 500,
+                    transition: 'all 0.3s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#1976d2';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = '#2196f3';
+                  }}
                 >
                   Edit
                 </button>
                 <button
-                  className="btn"
-                  style={{ backgroundColor: '#E74C3C', color: 'white', padding: '8px 12px', flex: 1 }}
                   onClick={() => deleteItem(section, item.id)}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    background: '#E74C3C',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    fontWeight: 500,
+                    transition: 'all 0.3s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#C0392B';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = '#E74C3C';
+                  }}
                 >
                   Delete
                 </button>
@@ -247,7 +345,6 @@ export default function KitchenDatabase() {
     </div>
   );
 
-  // Render current view
   const renderContent = () => {
     switch (currentView) {
       case 'recipes':
@@ -271,86 +368,103 @@ export default function KitchenDatabase() {
     }
   };
 
+  const tabs = [
+    { id: 'dashboard', label: '📊 Dashboard' },
+    { id: 'recipes', label: '📖 Recipes' },
+    { id: 'sops', label: '📋 SOPs' },
+    { id: 'techniques', label: '🎯 Techniques' },
+    { id: 'notes', label: '📝 Notes' },
+    { id: 'videos', label: '🎬 Videos' },
+    { id: 'links', label: '🔗 Links' },
+    { id: 'media', label: '📁 Media' },
+    { id: 'cookbooks', label: '📚 Cookbooks' },
+  ];
+
   return (
-    <div>
+    <div style={{ background: '#F0CF92', minHeight: '100vh' }}>
       {/* Header */}
-      <header className="header">
-        <div className="container">
-          <div className="header-content">
-            <div className="logo">
-              <span className="logo-icon">👨‍🍳</span>
-              <h1 className="logo-text">Chef Virtu's Kitchen DB</h1>
+      <header
+        style={{
+          background: 'linear-gradient(135deg, #21808D 0%, #1D7480 100%)',
+          color: 'white',
+          padding: '24px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          position: 'sticky',
+          top: 0,
+          zIndex: 100,
+        }}
+      >
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontSize: '2.5rem' }}>👨‍🍳</span>
+              <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 700 }}>Chef Virtu's Kitchen</h1>
             </div>
-            <input type="search" placeholder="Search recipes, notes..." className="search-input" />
+            <input
+              type="search"
+              placeholder="Search recipes, notes..."
+              style={{
+                padding: '10px 15px',
+                border: 'none',
+                borderRadius: '6px',
+                width: '250px',
+                fontSize: '14px',
+              }}
+            />
           </div>
         </div>
       </header>
 
       {/* Navigation */}
-      <nav className="main-nav">
-        <div className="container">
-          <ul className="nav-list">
-            <button
-              className={`nav-link ${currentView === 'dashboard' ? 'active' : ''}`}
-              onClick={() => setCurrentView('dashboard')}
-            >
-              📊 Dashboard
-            </button>
-            <button
-              className={`nav-link ${currentView === 'recipes' ? 'active' : ''}`}
-              onClick={() => setCurrentView('recipes')}
-            >
-              📖 Recipes
-            </button>
-            <button
-              className={`nav-link ${currentView === 'sops' ? 'active' : ''}`}
-              onClick={() => setCurrentView('sops')}
-            >
-              📋 SOPs
-            </button>
-            <button
-              className={`nav-link ${currentView === 'techniques' ? 'active' : ''}`}
-              onClick={() => setCurrentView('techniques')}
-            >
-              🎯 Techniques
-            </button>
-            <button
-              className={`nav-link ${currentView === 'notes' ? 'active' : ''}`}
-              onClick={() => setCurrentView('notes')}
-            >
-              📝 Notes
-            </button>
-            <button
-              className={`nav-link ${currentView === 'videos' ? 'active' : ''}`}
-              onClick={() => setCurrentView('videos')}
-            >
-              🎬 Videos
-            </button>
-            <button
-              className={`nav-link ${currentView === 'links' ? 'active' : ''}`}
-              onClick={() => setCurrentView('links')}
-            >
-              🔗 Links
-            </button>
-            <button
-              className={`nav-link ${currentView === 'media' ? 'active' : ''}`}
-              onClick={() => setCurrentView('media')}
-            >
-              📁 Media
-            </button>
-            <button
-              className={`nav-link ${currentView === 'cookbooks' ? 'active' : ''}`}
-              onClick={() => setCurrentView('cookbooks')}
-            >
-              📚 Cookbooks
-            </button>
-          </ul>
+      <nav
+        style={{
+          background: 'white',
+          borderBottom: '2px solid #E8DCC4',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+          position: 'sticky',
+          top: 80,
+          zIndex: 99,
+        }}
+      >
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 16px' }}>
+          <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '0' }}>
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setCurrentView(tab.id)}
+                style={{
+                  padding: '16px 20px',
+                  border: 'none',
+                  background: currentView === tab.id ? 'white' : 'transparent',
+                  color: currentView === tab.id ? '#21808D' : '#666',
+                  borderBottom: currentView === tab.id ? '3px solid #21808D' : '3px solid transparent',
+                  cursor: 'pointer',
+                  fontSize: '0.95rem',
+                  fontWeight: currentView === tab.id ? 600 : 500,
+                  transition: 'all 0.3s ease',
+                  whiteSpace: 'nowrap',
+                }}
+                onMouseEnter={(e) => {
+                  if (currentView !== tab.id) {
+                    e.currentTarget.style.color = '#21808D';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (currentView !== tab.id) {
+                    e.currentTarget.style.color = '#666';
+                  }
+                }}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
       </nav>
 
       {/* Main Content */}
-      <main className="main-content">
-        <div className="container">{renderContent()}</div>
+      <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 16px', minHeight: 'calc(100vh - 280px)' }}>
+        {renderContent()}
       </main>
 
       {/* Slide-in Panel */}
@@ -363,16 +477,21 @@ export default function KitchenDatabase() {
       />
 
       {/* Footer */}
-      <footer className="footer">
-        <div className="container">
-          <p>&copy; 2025 Chef Virtu's Kitchen Database. All rights reserved.</p>
-        </div>
+      <footer
+        style={{
+          background: '#21808D',
+          color: 'white',
+          textAlign: 'center',
+          padding: '24px',
+          marginTop: '40px',
+        }}
+      >
+        <p style={{ margin: 0 }}>&copy; 2025 Chef Virtu's Kitchen Database. All rights reserved.</p>
       </footer>
     </div>
   );
 }
 
-// FormPanel Component
 interface FormPanelProps {
   isOpen: boolean;
   type: string;
@@ -392,12 +511,14 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave(formData);
+    setFormData({});
   };
 
   return (
     <>
       {/* Overlay */}
       <div
+        onClick={onClose}
         style={{
           position: 'fixed',
           top: 0,
@@ -409,10 +530,9 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
           pointerEvents: isOpen ? 'auto' : 'none',
           zIndex: 999,
         }}
-        onClick={onClose}
       />
 
-      {/* Slide-in Panel */}
+      {/* Slide Panel */}
       <div
         style={{
           position: 'fixed',
@@ -420,9 +540,9 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
           right: 0,
           height: '100vh',
           width: '100%',
-          maxWidth: '500px',
+          maxWidth: '480px',
           background: 'white',
-          boxShadow: '-2px 0 8px rgba(0, 0, 0, 0.1)',
+          boxShadow: '-2px 0 12px rgba(0, 0, 0, 0.15)',
           transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
           transition: 'transform 0.3s ease',
           zIndex: 1000,
@@ -431,56 +551,58 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
           overflow: 'hidden',
         }}
       >
-        {/* Panel Header */}
+        {/* Header */}
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '24px',
-            background: '#f9f9f9',
-            borderBottom: '1px solid #e0e0e0',
+            background: 'linear-gradient(135deg, #21808D 0%, #1D7480 100%)',
+            color: 'white',
             flexShrink: 0,
           }}
         >
-          <h2 style={{ margin: 0, fontSize: '1.5rem', color: '#2C3E50', fontWeight: 600 }}>
-            {item ? 'Edit' : 'Add'} {type}
+          <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>
+            {item ? '✏️ Edit' : '➕ Add'} {type}
           </h2>
           <button
             onClick={onClose}
             style={{
-              background: 'none',
+              background: 'rgba(255,255,255,0.2)',
               border: 'none',
-              fontSize: '2rem',
-              color: '#999',
+              color: 'white',
+              fontSize: '1.8rem',
               cursor: 'pointer',
-              padding: 0,
-              width: '40px',
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              padding: '4px 8px',
+              borderRadius: '6px',
               transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
             }}
           >
             ✕
           </button>
         </div>
 
-        {/* Panel Form */}
+        {/* Form */}
         <form
           onSubmit={handleSubmit}
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: '16px',
-            padding: '24px',
+            gap: '20px',
+            padding: '28px',
             overflowY: 'auto',
             flex: 1,
           }}
         >
           <div>
-            <label style={{ display: 'block', marginBottom: '6px', color: '#333', fontWeight: 500 }}>
+            <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontWeight: 600, fontSize: '0.95rem' }}>
               Title *
             </label>
             <input
@@ -489,21 +611,31 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
               value={formData.title || ''}
               onChange={handleChange}
               required
+              placeholder="Enter title"
               style={{
                 width: '100%',
                 padding: '12px',
-                border: '1px solid #ddd',
-                borderRadius: '6px',
+                border: '1px solid #E8DCC4',
+                borderRadius: '8px',
                 fontSize: '14px',
                 fontFamily: 'inherit',
-                background: 'white',
+                background: '#fafaf8',
                 color: '#333',
+                transition: 'all 0.3s',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = '#21808D';
+                e.currentTarget.style.background = 'white';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = '#E8DCC4';
+                e.currentTarget.style.background = '#fafaf8';
               }}
             />
           </div>
 
           <div>
-            <label style={{ display: 'block', marginBottom: '6px', color: '#333', fontWeight: 500 }}>
+            <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontWeight: 600, fontSize: '0.95rem' }}>
               Category
             </label>
             <input
@@ -511,99 +643,141 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
               name="category"
               value={formData.category || formData.cuisine || ''}
               onChange={handleChange}
+              placeholder="e.g., French, Daily Operations"
               style={{
                 width: '100%',
                 padding: '12px',
-                border: '1px solid #ddd',
-                borderRadius: '6px',
+                border: '1px solid #E8DCC4',
+                borderRadius: '8px',
                 fontSize: '14px',
                 fontFamily: 'inherit',
-                background: 'white',
+                background: '#fafaf8',
                 color: '#333',
+                transition: 'all 0.3s',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = '#21808D';
+                e.currentTarget.style.background = 'white';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = '#E8DCC4';
+                e.currentTarget.style.background = '#fafaf8';
               }}
             />
           </div>
 
           <div>
-            <label style={{ display: 'block', marginBottom: '6px', color: '#333', fontWeight: 500 }}>
+            <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontWeight: 600, fontSize: '0.95rem' }}>
               Description
             </label>
             <textarea
               name="description"
               value={formData.description || ''}
               onChange={handleChange}
-              rows={4}
+              rows={3}
+              placeholder="Add a description..."
               style={{
                 width: '100%',
                 padding: '12px',
-                border: '1px solid #ddd',
-                borderRadius: '6px',
+                border: '1px solid #E8DCC4',
+                borderRadius: '8px',
                 fontSize: '14px',
                 fontFamily: 'inherit',
-                background: 'white',
+                background: '#fafaf8',
                 color: '#333',
                 resize: 'vertical',
+                transition: 'all 0.3s',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = '#21808D';
+                e.currentTarget.style.background = 'white';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = '#E8DCC4';
+                e.currentTarget.style.background = '#fafaf8';
               }}
             />
           </div>
 
           <div>
-            <label style={{ display: 'block', marginBottom: '6px', color: '#333', fontWeight: 500 }}>
-              Content / Steps
+            <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontWeight: 600, fontSize: '0.95rem' }}>
+              Content / Details
             </label>
             <textarea
               name="content"
               value={formData.content || formData.steps || ''}
               onChange={handleChange}
-              rows={6}
+              rows={5}
+              placeholder="Add content, steps, or additional details..."
               style={{
                 width: '100%',
                 padding: '12px',
-                border: '1px solid #ddd',
-                borderRadius: '6px',
+                border: '1px solid #E8DCC4',
+                borderRadius: '8px',
                 fontSize: '14px',
                 fontFamily: 'inherit',
-                background: 'white',
+                background: '#fafaf8',
                 color: '#333',
                 resize: 'vertical',
+                transition: 'all 0.3s',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = '#21808D';
+                e.currentTarget.style.background = 'white';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = '#E8DCC4';
+                e.currentTarget.style.background = '#fafaf8';
               }}
             />
           </div>
 
-          {/* Panel Actions */}
-          <div
-            style={{
-              display: 'flex',
-              gap: '12px',
-              justifyContent: 'flex-end',
-              marginTop: '24px',
-              paddingTop: '24px',
-              background: '#f9f9f9',
-              borderTop: '1px solid #e0e0e0',
-              marginLeft: '-24px',
-              marginRight: '-24px',
-              marginBottom: '-24px',
-              padding: '24px',
-            }}
-          >
+          {/* Actions */}
+          <div style={{ display: 'flex', gap: '12px', marginTop: 'auto' }}>
             <button
               type="submit"
-              className="btn btn-primary"
               style={{
-                padding: '10px 24px',
+                flex: 1,
+                padding: '12px',
+                background: '#21808D',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 600,
+                transition: 'all 0.3s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#1D7480';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#21808D';
+                e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
               Save
             </button>
             <button
               type="button"
-              className="btn"
-              style={{
-                padding: '10px 24px',
-                backgroundColor: '#999',
-                color: 'white',
-              }}
               onClick={onClose}
+              style={{
+                flex: 1,
+                padding: '12px',
+                background: '#E8DCC4',
+                color: '#333',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 600,
+                transition: 'all 0.3s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#E0D1B5';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#E8DCC4';
+              }}
             >
               Cancel
             </button>
