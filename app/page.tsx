@@ -9,6 +9,18 @@ interface FormData {
   [key: string]: string;
 }
 
+// Color Palette
+const colors = {
+  primary: '#0492C2',      // Bright Blue
+  accent: '#FAEFDA',       // Cream White
+  light: '#F0CF92',        // Light Tan (Background)
+  medium: '#BFB195',       // Medium Tan
+  dark: '#A08A61',         // Dark Tan
+  text: '#1A1A1A',         // Very Dark (Text)
+  lightText: '#FFFFFF',    // White Text
+  danger: '#E74C3C',       // Red
+};
+
 export default function KitchenDatabase() {
   const [currentView, setCurrentView] = useState<string>('dashboard');
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
@@ -80,7 +92,7 @@ export default function KitchenDatabase() {
 
     const actualType = typeMap[type];
     const item = data[actualType]?.find((i: ItemRecord) => i.id === id);
-    
+
     setFormType(type);
     setEditingItem(item || null);
     setIsFormOpen(true);
@@ -147,10 +159,10 @@ export default function KitchenDatabase() {
 
   const renderDashboard = () => (
     <div>
-      <h2 style={{ fontSize: '2.5rem', color: '#1A3A3F', marginBottom: '8px', fontWeight: 700 }}>
+      <h2 style={{ fontSize: '2.8rem', color: colors.primary, marginBottom: '8px', fontWeight: 700 }}>
         Welcome to Your Kitchen
       </h2>
-      <p style={{ fontSize: '1.1rem', color: '#555', marginBottom: '40px', lineHeight: '1.6' }}>
+      <p style={{ fontSize: '1.1rem', color: colors.dark, marginBottom: '40px', lineHeight: '1.6' }}>
         Organize your culinary knowledge, recipes, and techniques in one place
       </p>
 
@@ -173,36 +185,37 @@ export default function KitchenDatabase() {
           { section: 'cookbooks', icon: '📚', title: 'Cookbooks' },
         ].map((item) => (
           <div
-  key={item.section}
-  onClick={() => setCurrentView(item.section)}
-  style={{
-    background: '#B38580',
-    border: 'none',
-    borderRadius: '12px',
-    padding: '24px',
-    cursor: 'pointer',
-    transition: 'all 0.3s ease',
-    textAlign: 'center',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.transform = 'translateY(-8px)';
-    e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.transform = 'translateY(0)';
-    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
-  }}
->
-  <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>{item.icon}</div>
-  <h3 style={{ margin: '0 0 8px 0', color: 'white', fontSize: '1.2rem', fontWeight: 600 }}>
-    {item.title}
-  </h3>
-  <p style={{ margin: 0, color: 'rgba(255, 255, 255, 0.9)', fontSize: '1.1rem', fontWeight: 500 }}>
-    {data[item.section].length}
-  </p>
-</div>
-
+            key={item.section}
+            onClick={() => setCurrentView(item.section)}
+            style={{
+              background: colors.accent,
+              border: `2px solid ${colors.medium}`,
+              borderRadius: '14px',
+              padding: '28px 20px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              textAlign: 'center',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-8px)';
+              e.currentTarget.style.borderColor = colors.primary;
+              e.currentTarget.style.boxShadow = `0 12px 28px ${colors.primary}20`;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.borderColor = colors.medium;
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+            }}
+          >
+            <div style={{ fontSize: '2.8rem', marginBottom: '12px' }}>{item.icon}</div>
+            <h3 style={{ margin: '0 0 8px 0', color: colors.primary, fontSize: '1.2rem', fontWeight: 700 }}>
+              {item.title}
+            </h3>
+            <p style={{ margin: 0, color: colors.dark, fontSize: '1rem', fontWeight: 600 }}>
+              {data[item.section].length} {item.title.toLowerCase()}
+            </p>
+          </div>
         ))}
       </div>
     </div>
@@ -217,40 +230,39 @@ export default function KitchenDatabase() {
           alignItems: 'center',
           marginBottom: '30px',
           paddingBottom: '20px',
-          borderBottom: '2px solid #E8DCC4',
+          borderBottom: `3px solid ${colors.medium}`,
         }}
       >
-        <h2 style={{ margin: 0, fontSize: '2rem', color: '#1A3A3F', fontWeight: 700 }}>{title}</h2>
+        <h2 style={{ margin: 0, fontSize: '2.2rem', color: colors.primary, fontWeight: 700 }}>{title}</h2>
         <button
           onClick={() => openAddForm(type)}
           style={{
-            background: '#B38580',
-            color: 'white',
+            background: colors.primary,
+            color: colors.lightText,
             border: 'none',
-            padding: '12px 24px',
-            borderRadius: '8px',
+            padding: '12px 28px',
+            borderRadius: '10px',
             cursor: 'pointer',
             fontSize: '0.95rem',
             fontWeight: 600,
             transition: 'all 0.3s ease',
+            boxShadow: `0 4px 12px ${colors.primary}30`,
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = '#1D7480';
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(33, 128, 141, 0.3)';
+            e.currentTarget.style.transform = 'translateY(-3px)';
+            e.currentTarget.style.boxShadow = `0 8px 20px ${colors.primary}50`;
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = '#B38580';
             e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = 'none';
+            e.currentTarget.style.boxShadow = `0 4px 12px ${colors.primary}30`;
           }}
         >
-          + Add
+          + Add {title.slice(0, -1)}
         </button>
       </div>
 
       {!data[section] || data[section].length === 0 ? (
-        <div style={{ textAlign: 'center', color: '#999', padding: '60px 20px' }}>
+        <div style={{ textAlign: 'center', color: colors.dark, padding: '60px 20px' }}>
           <p style={{ fontSize: '1.1rem', margin: 0 }}>No items yet. Click the button to add one!</p>
         </div>
       ) : (
@@ -265,29 +277,29 @@ export default function KitchenDatabase() {
             <div
               key={item.id}
               style={{
-                background: 'white',
-                border: '1px solid #E8DCC4',
+                background: colors.accent,
+                border: `1px solid ${colors.medium}`,
                 borderRadius: '12px',
                 padding: '20px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                 transition: 'all 0.3s ease',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.1)';
+                e.currentTarget.style.boxShadow = `0 8px 20px ${colors.primary}20`;
                 e.currentTarget.style.transform = 'translateY(-4px)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
-              <h3 style={{ margin: '0 0 8px 0', color: '#B38580', fontSize: '1.15rem', fontWeight: 600 }}>
+              <h3 style={{ margin: '0 0 8px 0', color: colors.primary, fontSize: '1.15rem', fontWeight: 700 }}>
                 {item.title}
               </h3>
-              <p style={{ color: '#999', fontSize: '0.85rem', margin: '0 0 12px 0' }}>
+              <p style={{ color: colors.dark, fontSize: '0.85rem', margin: '0 0 12px 0', fontWeight: 500 }}>
                 {item.category || item.cuisine || 'General'}
               </p>
-              <p style={{ color: '#666', margin: '12px 0', minHeight: '50px', lineHeight: '1.5' }}>
+              <p style={{ color: colors.text, margin: '12px 0', minHeight: '50px', lineHeight: '1.5' }}>
                 {item.description || 'No description'}
               </p>
               <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
@@ -296,20 +308,22 @@ export default function KitchenDatabase() {
                   style={{
                     flex: 1,
                     padding: '8px 12px',
-                    background: '#2196f3',
-                    color: 'white',
+                    background: colors.primary,
+                    color: colors.lightText,
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
                     fontSize: '0.9rem',
-                    fontWeight: 500,
+                    fontWeight: 600,
                     transition: 'all 0.3s ease',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#1976d2';
+                    e.currentTarget.style.opacity = '0.9';
+                    e.currentTarget.style.transform = 'scale(1.02)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = '#2196f3';
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.transform = 'scale(1)';
                   }}
                 >
                   Edit
@@ -319,20 +333,22 @@ export default function KitchenDatabase() {
                   style={{
                     flex: 1,
                     padding: '8px 12px',
-                    background: '#E74C3C',
-                    color: 'white',
+                    background: colors.danger,
+                    color: colors.lightText,
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
                     fontSize: '0.9rem',
-                    fontWeight: 500,
+                    fontWeight: 600,
                     transition: 'all 0.3s ease',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#C0392B';
+                    e.currentTarget.style.opacity = '0.9';
+                    e.currentTarget.style.transform = 'scale(1.02)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = '#E74C3C';
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.transform = 'scale(1)';
                   }}
                 >
                   Delete
@@ -381,14 +397,14 @@ export default function KitchenDatabase() {
   ];
 
   return (
-    <div style={{ background: '#F0CF92', minHeight: '100vh' }}>
+    <div style={{ background: colors.light, minHeight: '100vh' }}>
       {/* Header */}
       <header
         style={{
-          background: 'linear-gradient(135deg, #B38580 0%, #1D7480 100%)',
-          color: 'white',
+          background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.dark} 100%)`,
+          color: colors.lightText,
           padding: '24px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          boxShadow: `0 4px 16px ${colors.primary}30`,
           position: 'sticky',
           top: 0,
           zIndex: 100,
@@ -405,10 +421,12 @@ export default function KitchenDatabase() {
               placeholder="Search recipes, notes..."
               style={{
                 padding: '10px 15px',
-                border: 'none',
-                borderRadius: '6px',
+                border: `2px solid ${colors.accent}`,
+                borderRadius: '8px',
                 width: '250px',
                 fontSize: '14px',
+                background: `${colors.accent}80`,
+                color: colors.text,
               }}
             />
           </div>
@@ -418,9 +436,9 @@ export default function KitchenDatabase() {
       {/* Navigation */}
       <nav
         style={{
-          background: 'white',
-          borderBottom: '2px solid #E8DCC4',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+          background: colors.accent,
+          borderBottom: `3px solid ${colors.primary}`,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
           position: 'sticky',
           top: 80,
           zIndex: 99,
@@ -435,23 +453,23 @@ export default function KitchenDatabase() {
                 style={{
                   padding: '16px 20px',
                   border: 'none',
-                  background: currentView === tab.id ? 'white' : 'transparent',
-                  color: currentView === tab.id ? '#B38580' : '#666',
-                  borderBottom: currentView === tab.id ? '3px solid #B38580' : '3px solid transparent',
+                  background: currentView === tab.id ? colors.light : 'transparent',
+                  color: currentView === tab.id ? colors.primary : colors.dark,
+                  borderBottom: currentView === tab.id ? `3px solid ${colors.primary}` : '3px solid transparent',
                   cursor: 'pointer',
                   fontSize: '0.95rem',
-                  fontWeight: currentView === tab.id ? 600 : 500,
+                  fontWeight: currentView === tab.id ? 700 : 600,
                   transition: 'all 0.3s ease',
                   whiteSpace: 'nowrap',
                 }}
                 onMouseEnter={(e) => {
                   if (currentView !== tab.id) {
-                    e.currentTarget.style.color = '#B38580';
+                    e.currentTarget.style.color = colors.primary;
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (currentView !== tab.id) {
-                    e.currentTarget.style.color = '#666';
+                    e.currentTarget.style.color = colors.dark;
                   }
                 }}
               >
@@ -479,8 +497,8 @@ export default function KitchenDatabase() {
       {/* Footer */}
       <footer
         style={{
-          background: '#B38580',
-          color: 'white',
+          background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.dark} 100%)`,
+          color: colors.lightText,
           textAlign: 'center',
           padding: '24px',
           marginTop: '40px',
@@ -503,7 +521,6 @@ interface FormPanelProps {
 function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
   const [formData, setFormData] = useState<FormData>({});
 
-  // 🔥 FIX: Update form data when item changes
   useEffect(() => {
     if (item) {
       setFormData(item);
@@ -550,8 +567,8 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
           height: '100vh',
           width: '100%',
           maxWidth: '480px',
-          background: 'white',
-          boxShadow: '-2px 0 12px rgba(0, 0, 0, 0.15)',
+          background: colors.accent,
+          boxShadow: `-4px 0 16px ${colors.primary}30`,
           transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
           transition: 'transform 0.3s ease',
           zIndex: 1000,
@@ -567,12 +584,12 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '24px',
-            background: 'linear-gradient(135deg, #B38580 0%, #1D7480 100%)',
-            color: 'white',
+            background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.dark} 100%)`,
+            color: colors.lightText,
             flexShrink: 0,
           }}
         >
-          <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>
+          <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700 }}>
             {item ? '✏️ Edit' : '➕ Add'} {type}
           </h2>
           <button
@@ -580,7 +597,7 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
             style={{
               background: 'rgba(255,255,255,0.2)',
               border: 'none',
-              color: 'white',
+              color: colors.lightText,
               fontSize: '1.8rem',
               cursor: 'pointer',
               padding: '4px 8px',
@@ -611,7 +628,7 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
           }}
         >
           <div>
-            <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontWeight: 600, fontSize: '0.95rem' }}>
+            <label style={{ display: 'block', marginBottom: '8px', color: colors.primary, fontWeight: 700, fontSize: '0.95rem' }}>
               Title *
             </label>
             <input
@@ -624,27 +641,27 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
               style={{
                 width: '100%',
                 padding: '12px',
-                border: '1px solid #E8DCC4',
+                border: `2px solid ${colors.medium}`,
                 borderRadius: '8px',
                 fontSize: '14px',
                 fontFamily: 'inherit',
-                background: '#fafaf8',
-                color: '#333',
+                background: colors.lightText,
+                color: colors.text,
                 transition: 'all 0.3s',
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#B38580';
-                e.currentTarget.style.background = 'white';
+                e.currentTarget.style.borderColor = colors.primary;
+                e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary}15`;
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = '#E8DCC4';
-                e.currentTarget.style.background = '#fafaf8';
+                e.currentTarget.style.borderColor = colors.medium;
+                e.currentTarget.style.boxShadow = 'none';
               }}
             />
           </div>
 
           <div>
-            <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontWeight: 600, fontSize: '0.95rem' }}>
+            <label style={{ display: 'block', marginBottom: '8px', color: colors.primary, fontWeight: 700, fontSize: '0.95rem' }}>
               Category
             </label>
             <input
@@ -656,27 +673,27 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
               style={{
                 width: '100%',
                 padding: '12px',
-                border: '1px solid #E8DCC4',
+                border: `2px solid ${colors.medium}`,
                 borderRadius: '8px',
                 fontSize: '14px',
                 fontFamily: 'inherit',
-                background: '#fafaf8',
-                color: '#333',
+                background: colors.lightText,
+                color: colors.text,
                 transition: 'all 0.3s',
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#B38580';
-                e.currentTarget.style.background = 'white';
+                e.currentTarget.style.borderColor = colors.primary;
+                e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary}15`;
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = '#E8DCC4';
-                e.currentTarget.style.background = '#fafaf8';
+                e.currentTarget.style.borderColor = colors.medium;
+                e.currentTarget.style.boxShadow = 'none';
               }}
             />
           </div>
 
           <div>
-            <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontWeight: 600, fontSize: '0.95rem' }}>
+            <label style={{ display: 'block', marginBottom: '8px', color: colors.primary, fontWeight: 700, fontSize: '0.95rem' }}>
               Description
             </label>
             <textarea
@@ -688,28 +705,28 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
               style={{
                 width: '100%',
                 padding: '12px',
-                border: '1px solid #E8DCC4',
+                border: `2px solid ${colors.medium}`,
                 borderRadius: '8px',
                 fontSize: '14px',
                 fontFamily: 'inherit',
-                background: '#fafaf8',
-                color: '#333',
+                background: colors.lightText,
+                color: colors.text,
                 resize: 'vertical',
                 transition: 'all 0.3s',
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#B38580';
-                e.currentTarget.style.background = 'white';
+                e.currentTarget.style.borderColor = colors.primary;
+                e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary}15`;
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = '#E8DCC4';
-                e.currentTarget.style.background = '#fafaf8';
+                e.currentTarget.style.borderColor = colors.medium;
+                e.currentTarget.style.boxShadow = 'none';
               }}
             />
           </div>
 
           <div>
-            <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontWeight: 600, fontSize: '0.95rem' }}>
+            <label style={{ display: 'block', marginBottom: '8px', color: colors.primary, fontWeight: 700, fontSize: '0.95rem' }}>
               Content / Details
             </label>
             <textarea
@@ -721,22 +738,22 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
               style={{
                 width: '100%',
                 padding: '12px',
-                border: '1px solid #E8DCC4',
+                border: `2px solid ${colors.medium}`,
                 borderRadius: '8px',
                 fontSize: '14px',
                 fontFamily: 'inherit',
-                background: '#fafaf8',
-                color: '#333',
+                background: colors.lightText,
+                color: colors.text,
                 resize: 'vertical',
                 transition: 'all 0.3s',
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#B38580';
-                e.currentTarget.style.background = 'white';
+                e.currentTarget.style.borderColor = colors.primary;
+                e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary}15`;
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = '#E8DCC4';
-                e.currentTarget.style.background = '#fafaf8';
+                e.currentTarget.style.borderColor = colors.medium;
+                e.currentTarget.style.boxShadow = 'none';
               }}
             />
           </div>
@@ -748,21 +765,22 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
               style={{
                 flex: 1,
                 padding: '12px',
-                background: '#B38580',
-                color: 'white',
+                background: colors.primary,
+                color: colors.lightText,
                 border: 'none',
                 borderRadius: '8px',
                 cursor: 'pointer',
-                fontWeight: 600,
+                fontWeight: 700,
                 transition: 'all 0.3s',
+                boxShadow: `0 4px 12px ${colors.primary}30`,
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#1D7480';
                 e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = `0 8px 20px ${colors.primary}50`;
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#B38580';
                 e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = `0 4px 12px ${colors.primary}30`;
               }}
             >
               Save
@@ -773,19 +791,19 @@ function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
               style={{
                 flex: 1,
                 padding: '12px',
-                background: '#E8DCC4',
-                color: '#333',
+                background: colors.medium,
+                color: colors.lightText,
                 border: 'none',
                 borderRadius: '8px',
                 cursor: 'pointer',
-                fontWeight: 600,
+                fontWeight: 700,
                 transition: 'all 0.3s',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#E0D1B5';
+                e.currentTarget.style.opacity = '0.9';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#E8DCC4';
+                e.currentTarget.style.opacity = '1';
               }}
             >
               Cancel
