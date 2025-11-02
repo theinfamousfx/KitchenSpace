@@ -1,568 +1,615 @@
 'use client';
 
 import { useState } from 'react';
-import '../styles/kitchen.css';
+import './page.css';
 
-// Type definitions for different items
-type Recipe = {
+interface Item {
   id: number;
   title: string;
-  cuisine: string;
-  difficulty: string;
-  servings: number;
-  preptime: number;
-  cooktime: number;
-  description: string;
-  ingredients: string;
-  instructions: string;
-};
+  [key: string]: any;
+}
 
-type SOP = {
-  id: number;
-  title: string;
-  category: string;
-  priority: string;
-  description: string;
-  steps: string;
-  compliancenotes: string;
-};
+interface FormData {
+  [key: string]: string;
+}
 
-type Technique = {
-  id: number;
-  title: string;
-  description: string;
-  steps: string;
-  tools: string;
-};
+export default function KitchenDatabase() {
+  const [currentView, setCurrentView] = useState<string>('dashboard');
+  const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
+  const [formType, setFormType] = useState<string>('');
+  const [editingItem, setEditingItem] = useState<Item | null>(null);
 
-type Note = {
-  id: number;
-  title: string;
-  content: string;
-  category: string;
-};
+  const [data, setData] = useState({
+    recipes: [
+      {
+        id: 1,
+        title: 'Chocolate Soufflé',
+        cuisine: 'French',
+        difficulty: 'Advanced',
+        servings: 6,
+        preptime: 45,
+        cooktime: 15,
+        description: 'A classic French dessert that rises magnificently.',
+        ingredients: '200g dark chocolate, 6 eggs, 75g sugar',
+        instructions: 'Mix and bake at 190°C',
+      },
+    ],
+    sops: [
+      {
+        id: 1,
+        title: 'Kitchen Opening',
+        category: 'Daily Operations',
+        priority: 'High',
+        description: 'Complete daily opening procedures',
+        steps: 'Check temps, clean equipment, prep stations',
+        compliancenotes: 'Temperature logs required before service',
+      },
+    ],
+    techniques: [] as Item[],
+    notes: [] as Item[],
+    videos: [] as Item[],
+    links: [] as Item[],
+    media: [] as Item[],
+    cookbooks: [] as Item[],
+  });
 
-type Resource = {
-  id: number;
-  title: string;
-  type: string;
-  url: string;
-  description: string;
-};
-
-type Cookbook = {
-  id: number;
-  title: string;
-  author: string;
-  cuisine: string;
-  rating: number;
-  notes: string;
-};
-
-export default function Home() {
-  // State management
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [sops, setSOPs] = useState<SOP[]>([]);
-  const [techniques, setTechniques] = useState<Technique[]>([]);
-  const [notes, setNotes] = useState<Note[]>([]);
-  const [resources, setResources] = useState<Resource[]>([]);
-  const [cookbooks, setCookbooks] = useState<Cookbook[]>([]);
-
-  // Panel state
-  const [showPanel, setShowPanel] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>('');
-  const [formData, setFormData] = useState<Record<string, any>>({});
-
-  // IDs counter
   const [nextIds, setNextIds] = useState({
-    recipes: 1,
-    sops: 1,
+    recipes: 2,
+    sops: 2,
     techniques: 1,
     notes: 1,
-    resources: 1,
+    videos: 1,
+    links: 1,
+    media: 1,
     cookbooks: 1,
   });
 
-  // Open add panel
-  const handleAddClick = (section: string) => {
-    setActiveSection(section);
-    setFormData({});
-    setShowPanel(true);
+  // Open form for adding
+  const openAddForm = (type: string) => {
+    setFormType(type);
+    setEditingItem(null);
+    setIsFormOpen(true);
   };
 
-  // Close panel
-  const handleClosePanel = () => {
-    setShowPanel(false);
-    setFormData({});
-    setActiveSection('');
+  // Open form for editing
+  const openEditForm = (type: string, id: number) => {
+    const typeMap: { [key: string]: keyof typeof data } = {
+      recipe: 'recipes',
+      sop: 'sops',
+      technique: 'techniques',
+      note: 'notes',
+      video: 'videos',
+      link: 'links',
+      media: 'media',
+      cookbook: 'cookbooks',
+    };
+
+    const actualType = typeMap[type];
+    const item = data[actualType].find((i: Item) => i.id === id);
+
+    setFormType(type);
+    setEditingItem(item || null);
+    setIsFormOpen(true);
   };
 
-  // Handle input change
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  // Close form
+  const closeForm = () => {
+    setIsFormOpen(false);
+    setFormType('');
+    setEditingItem(null);
   };
 
-  // Handle number input
-  const handleNumberInput = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value ? parseInt(value) : 0,
-    }));
-  };
+  // Save item
+  const saveItem = (formData: FormData) => {
+    const typeMap: { [key: string]: keyof typeof data } = {
+      recipe: 'recipes',
+      sop: 'sops',
+      technique: 'techniques',
+      note: 'notes',
+      video: 'videos',
+      link: 'links',
+      media: 'media',
+      cookbook: 'cookbooks',
+    };
 
-  // Submit form
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    const actualType = typeMap[formType];
 
-    if (!formData.title || formData.title.trim() === '') {
-      alert('Title is required');
-      return;
-    }
+    setData((prevData) => {
+      const newData = { ...prevData };
 
-    try {
-      if (activeSection === 'Recipes') {
-        const newRecipe: Recipe = {
-          id: nextIds.recipes,
-          title: formData.title,
-          cuisine: formData.cuisine || '',
-          difficulty: formData.difficulty || 'Medium',
-          servings: formData.servings || 1,
-          preptime: formData.preptime || 0,
-          cooktime: formData.cooktime || 0,
-          description: formData.description || '',
-          ingredients: formData.ingredients || '',
-          instructions: formData.instructions || '',
-        };
-        setRecipes([...recipes, newRecipe]);
-        setNextIds({ ...nextIds, recipes: nextIds.recipes + 1 });
-      } else if (activeSection === 'SOPs') {
-        const newSOP: SOP = {
-          id: nextIds.sops,
-          title: formData.title,
-          category: formData.category || '',
-          priority: formData.priority || 'Medium',
-          description: formData.description || '',
-          steps: formData.steps || '',
-          compliancenotes: formData.compliancenotes || '',
-        };
-        setSOPs([...sops, newSOP]);
-        setNextIds({ ...nextIds, sops: nextIds.sops + 1 });
-      } else if (activeSection === 'Techniques') {
-        const newTechnique: Technique = {
-          id: nextIds.techniques,
-          title: formData.title,
-          description: formData.description || '',
-          steps: formData.steps || '',
-          tools: formData.tools || '',
-        };
-        setTechniques([...techniques, newTechnique]);
-        setNextIds({ ...nextIds, techniques: nextIds.techniques + 1 });
-      } else if (activeSection === 'Notes') {
-        const newNote: Note = {
-          id: nextIds.notes,
-          title: formData.title,
-          content: formData.content || '',
-          category: formData.category || '',
-        };
-        setNotes([...notes, newNote]);
-        setNextIds({ ...nextIds, notes: nextIds.notes + 1 });
-      } else if (activeSection === 'Resources') {
-        const newResource: Resource = {
-          id: nextIds.resources,
-          title: formData.title,
-          type: formData.type || 'Link',
-          url: formData.url || '',
-          description: formData.description || '',
-        };
-        setResources([...resources, newResource]);
-        setNextIds({ ...nextIds, resources: nextIds.resources + 1 });
-      } else if (activeSection === 'Cookbooks') {
-        const newCookbook: Cookbook = {
-          id: nextIds.cookbooks,
-          title: formData.title,
-          author: formData.author || '',
-          cuisine: formData.cuisine || '',
-          rating: formData.rating || 5,
-          notes: formData.notes || '',
-        };
-        setCookbooks([...cookbooks, newCookbook]);
-        setNextIds({ ...nextIds, cookbooks: nextIds.cookbooks + 1 });
+      if (editingItem) {
+        const index = newData[actualType].findIndex((i: Item) => i.id === editingItem.id);
+        if (index !== -1) {
+          newData[actualType][index] = {
+            ...newData[actualType][index],
+            ...formData,
+          };
+        }
+      } else {
+        newData[actualType].push({
+          id: nextIds[actualType as keyof typeof nextIds],
+          ...formData,
+        });
+
+        setNextIds((prev) => ({
+          ...prev,
+          [actualType]: prev[actualType as keyof typeof prev] + 1,
+        }));
       }
 
-      handleClosePanel();
-    } catch (error) {
-      console.error('Error adding item:', error);
-      alert('Error adding item. Please try again.');
+      return newData;
+    });
+
+    closeForm();
+  };
+
+  // Delete item
+  const deleteItem = (section: keyof typeof data, id: number) => {
+    if (confirm('Delete this item?')) {
+      setData((prevData) => ({
+        ...prevData,
+        [section]: prevData[section].filter((item: Item) => item.id !== id),
+      }));
     }
   };
 
-  // Render form fields based on section
-  const renderFormFields = () => {
-    switch (activeSection) {
-      case 'Recipes':
-        return (
-          <>
-            <div className="form-group">
-              <label>Cuisine</label>
-              <input type="text" name="cuisine" placeholder="e.g., Italian, Asian" value={formData.cuisine || ''} onChange={handleInputChange} />
-            </div>
-            <div className="form-group">
-              <label>Difficulty</label>
-              <select name="difficulty" value={formData.difficulty || 'Medium'} onChange={handleInputChange}>
-                <option value="Easy">Easy</option>
-                <option value="Medium">Medium</option>
-                <option value="Hard">Hard</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label>Servings</label>
-              <input type="number" name="servings" placeholder="4" value={formData.servings || ''} onChange={handleNumberInput} />
-            </div>
-            <div className="form-group">
-              <label>Prep Time (minutes)</label>
-              <input type="number" name="preptime" placeholder="15" value={formData.preptime || ''} onChange={handleNumberInput} />
-            </div>
-            <div className="form-group">
-              <label>Cook Time (minutes)</label>
-              <input type="number" name="cooktime" placeholder="30" value={formData.cooktime || ''} onChange={handleNumberInput} />
-            </div>
-            <div className="form-group">
-              <label>Description</label>
-              <textarea name="description" placeholder="Recipe description and notes..." value={formData.description || ''} onChange={handleInputChange} />
-            </div>
-            <div className="form-group">
-              <label>Ingredients</label>
-              <textarea name="ingredients" placeholder="List ingredients, one per line..." value={formData.ingredients || ''} onChange={handleInputChange} />
-            </div>
-            <div className="form-group">
-              <label>Instructions</label>
-              <textarea name="instructions" placeholder="Step-by-step instructions..." value={formData.instructions || ''} onChange={handleInputChange} />
-            </div>
-          </>
-        );
+  // Render dashboard
+  const renderDashboard = () => (
+    <div className="content-section">
+      <h2>📊 Dashboard</h2>
+      <div className="stats-grid">
+        <div className="stat-card" onClick={() => setCurrentView('recipes')} style={{ cursor: 'pointer' }}>
+          <h3>Recipes</h3>
+          <p className="stat-number">{data.recipes.length}</p>
+        </div>
+        <div className="stat-card" onClick={() => setCurrentView('sops')} style={{ cursor: 'pointer' }}>
+          <h3>SOPs</h3>
+          <p className="stat-number">{data.sops.length}</p>
+        </div>
+        <div className="stat-card" onClick={() => setCurrentView('techniques')} style={{ cursor: 'pointer' }}>
+          <h3>Techniques</h3>
+          <p className="stat-number">{data.techniques.length}</p>
+        </div>
+        <div className="stat-card" onClick={() => setCurrentView('notes')} style={{ cursor: 'pointer' }}>
+          <h3>Notes</h3>
+          <p className="stat-number">{data.notes.length}</p>
+        </div>
+        <div className="stat-card" onClick={() => setCurrentView('videos')} style={{ cursor: 'pointer' }}>
+          <h3>Videos</h3>
+          <p className="stat-number">{data.videos.length}</p>
+        </div>
+        <div className="stat-card" onClick={() => setCurrentView('links')} style={{ cursor: 'pointer' }}>
+          <h3>Links</h3>
+          <p className="stat-number">{data.links.length}</p>
+        </div>
+        <div className="stat-card" onClick={() => setCurrentView('media')} style={{ cursor: 'pointer' }}>
+          <h3>Media</h3>
+          <p className="stat-number">{data.media.length}</p>
+        </div>
+        <div className="stat-card" onClick={() => setCurrentView('cookbooks')} style={{ cursor: 'pointer' }}>
+          <h3>Cookbooks</h3>
+          <p className="stat-number">{data.cookbooks.length}</p>
+        </div>
+      </div>
+    </div>
+  );
 
-      case 'SOPs':
-        return (
-          <>
-            <div className="form-group">
-              <label>Category</label>
-              <input type="text" name="category" placeholder="e.g., Prep, Safety, Cleanup" value={formData.category || ''} onChange={handleInputChange} />
-            </div>
-            <div className="form-group">
-              <label>Priority</label>
-              <select name="priority" value={formData.priority || 'Medium'} onChange={handleInputChange}>
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label>Description</label>
-              <textarea name="description" placeholder="SOP overview..." value={formData.description || ''} onChange={handleInputChange} />
-            </div>
-            <div className="form-group">
-              <label>Steps</label>
-              <textarea name="steps" placeholder="Detailed steps..." value={formData.steps || ''} onChange={handleInputChange} />
-            </div>
-            <div className="form-group">
-              <label>Compliance Notes</label>
-              <textarea name="compliancenotes" placeholder="Compliance and safety notes..." value={formData.compliancenotes || ''} onChange={handleInputChange} />
-            </div>
-          </>
-        );
+  // Render items list
+  const renderItems = (section: keyof typeof data, title: string, type: string) => (
+    <div className="content-section">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h2>{title}</h2>
+        <button className="btn btn-primary" onClick={() => openAddForm(type)}>
+          + Add {title.slice(0, -1)}
+        </button>
+      </div>
 
-      case 'Techniques':
-        return (
-          <>
-            <div className="form-group">
-              <label>Description</label>
-              <textarea name="description" placeholder="What is this technique?" value={formData.description || ''} onChange={handleInputChange} />
+      {data[section].length === 0 ? (
+        <p style={{ textAlign: 'center', color: '#999', padding: '40px 0' }}>No items yet. Click the button to add one!</p>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+          {data[section].map((item: Item) => (
+            <div key={item.id} style={{
+              border: '1px solid #e0e0e0',
+              borderRadius: '8px',
+              padding: '16px',
+              backgroundColor: '#f9f9f9',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+              transition: 'all 0.3s'
+            }}>
+              <h3 style={{ margin: '0 0 8px 0', color: '#2C3E50' }}>{item.title}</h3>
+              <p style={{ color: '#999', fontSize: '0.85rem', margin: '0 0 8px 0' }}>
+                {item.category || item.cuisine || 'General'}
+              </p>
+              <p style={{ color: '#666', margin: '8px 0', minHeight: '40px' }}>
+                {item.description || 'No description'}
+              </p>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                <button
+                  className="btn"
+                  style={{ backgroundColor: '#2196f3', color: 'white', padding: '8px 12px', flex: 1 }}
+                  onClick={() => openEditForm(type, item.id)}
+                >
+                  Edit
+                </button>
+                <button
+                  className="btn"
+                  style={{ backgroundColor: '#E74C3C', color: 'white', padding: '8px 12px', flex: 1 }}
+                  onClick={() => deleteItem(section, item.id)}
+                >
+                  Delete
+                </button>
+              </div>
             </div>
-            <div className="form-group">
-              <label>Steps</label>
-              <textarea name="steps" placeholder="How to perform this technique..." value={formData.steps || ''} onChange={handleInputChange} />
-            </div>
-            <div className="form-group">
-              <label>Tools Required</label>
-              <input type="text" name="tools" placeholder="e.g., Knife, Whisk, Pan" value={formData.tools || ''} onChange={handleInputChange} />
-            </div>
-          </>
-        );
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
-      case 'Notes':
-        return (
-          <>
-            <div className="form-group">
-              <label>Category</label>
-              <input type="text" name="category" placeholder="e.g., Ideas, Tips, Reminders" value={formData.category || ''} onChange={handleInputChange} />
-            </div>
-            <div className="form-group">
-              <label>Content</label>
-              <textarea name="content" placeholder="Your notes..." value={formData.content || ''} onChange={handleInputChange} rows={6} />
-            </div>
-          </>
-        );
-
-      case 'Resources':
-        return (
-          <>
-            <div className="form-group">
-              <label>Type</label>
-              <select name="type" value={formData.type || 'Link'} onChange={handleInputChange}>
-                <option value="Link">Link</option>
-                <option value="Video">Video</option>
-                <option value="Article">Article</option>
-                <option value="Book">Book</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label>URL</label>
-              <input type="url" name="url" placeholder="https://..." value={formData.url || ''} onChange={handleInputChange} />
-            </div>
-            <div className="form-group">
-              <label>Description</label>
-              <textarea name="description" placeholder="What is this resource about?" value={formData.description || ''} onChange={handleInputChange} />
-            </div>
-          </>
-        );
-
-      case 'Cookbooks':
-        return (
-          <>
-            <div className="form-group">
-              <label>Author</label>
-              <input type="text" name="author" placeholder="Cookbook author" value={formData.author || ''} onChange={handleInputChange} />
-            </div>
-            <div className="form-group">
-              <label>Cuisine</label>
-              <input type="text" name="cuisine" placeholder="e.g., French, Italian" value={formData.cuisine || ''} onChange={handleInputChange} />
-            </div>
-            <div className="form-group">
-              <label>Rating</label>
-              <select name="rating" value={formData.rating || 5} onChange={handleNumberInput}>
-                <option value="1">1 star</option>
-                <option value="2">2 stars</option>
-                <option value="3">3 stars</option>
-                <option value="4">4 stars</option>
-                <option value="5">5 stars</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label>Notes</label>
-              <textarea name="notes" placeholder="Your notes about this cookbook..." value={formData.notes || ''} onChange={handleInputChange} />
-            </div>
-          </>
-        );
-
+  // Render current view
+  const renderContent = () => {
+    switch (currentView) {
+      case 'recipes':
+        return renderItems('recipes', 'Recipes', 'recipe');
+      case 'sops':
+        return renderItems('sops', 'SOPs', 'sop');
+      case 'techniques':
+        return renderItems('techniques', 'Techniques', 'technique');
+      case 'notes':
+        return renderItems('notes', 'Notes', 'note');
+      case 'videos':
+        return renderItems('videos', 'Videos', 'video');
+      case 'links':
+        return renderItems('links', 'Links', 'link');
+      case 'media':
+        return renderItems('media', 'Media', 'media');
+      case 'cookbooks':
+        return renderItems('cookbooks', 'Cookbooks', 'cookbook');
       default:
-        return null;
+        return renderDashboard();
     }
-  };
-
-  // Dashboard button handler
-  const handleDashboardClick = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <main className="kitchen-container">
-      {/* PERSISTENT STICKY HEADER */}
-      <header className="sticky-header">
-        <div className="header-content">
-          <div className="header-left">
-            <h1>🍳 Kitchen Database</h1>
-          </div>
-          <div className="header-right">
-            <button className="btn-dashboard" onClick={handleDashboardClick}>
-              Dashboard
-            </button>
+    <div>
+      {/* Header */}
+      <header className="header">
+        <div className="container">
+          <div className="header-content">
+            <div className="logo">
+              <span className="logo-icon">👨‍🍳</span>
+              <h1 className="logo-text">Chef Virtu's Kitchen DB</h1>
+            </div>
+            <input type="search" placeholder="Search recipes, notes..." className="search-input" />
           </div>
         </div>
       </header>
 
-      {/* Overlay for panel */}
-      {showPanel && (
-        <div className="form-overlay" onClick={handleClosePanel} />
-      )}
+      {/* Navigation */}
+      <nav className="main-nav">
+        <div className="container">
+          <ul className="nav-list">
+            <button
+              className={`nav-link ${currentView === 'dashboard' ? 'active' : ''}`}
+              onClick={() => setCurrentView('dashboard')}
+            >
+              📊 Dashboard
+            </button>
+            <button
+              className={`nav-link ${currentView === 'recipes' ? 'active' : ''}`}
+              onClick={() => setCurrentView('recipes')}
+            >
+              📖 Recipes
+            </button>
+            <button
+              className={`nav-link ${currentView === 'sops' ? 'active' : ''}`}
+              onClick={() => setCurrentView('sops')}
+            >
+              📋 SOPs
+            </button>
+            <button
+              className={`nav-link ${currentView === 'techniques' ? 'active' : ''}`}
+              onClick={() => setCurrentView('techniques')}
+            >
+              🎯 Techniques
+            </button>
+            <button
+              className={`nav-link ${currentView === 'notes' ? 'active' : ''}`}
+              onClick={() => setCurrentView('notes')}
+            >
+              📝 Notes
+            </button>
+            <button
+              className={`nav-link ${currentView === 'videos' ? 'active' : ''}`}
+              onClick={() => setCurrentView('videos')}
+            >
+              🎬 Videos
+            </button>
+            <button
+              className={`nav-link ${currentView === 'links' ? 'active' : ''}`}
+              onClick={() => setCurrentView('links')}
+            >
+              🔗 Links
+            </button>
+            <button
+              className={`nav-link ${currentView === 'media' ? 'active' : ''}`}
+              onClick={() => setCurrentView('media')}
+            >
+              📁 Media
+            </button>
+            <button
+              className={`nav-link ${currentView === 'cookbooks' ? 'active' : ''}`}
+              onClick={() => setCurrentView('cookbooks')}
+            >
+              📚 Cookbooks
+            </button>
+          </ul>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className="main-content">
+        <div className="container">{renderContent()}</div>
+      </main>
 
       {/* Slide-in Panel */}
-      <div className={`slide-panel ${showPanel ? 'open' : ''}`}>
-        <div className="panel-header">
-          <h2>Add {activeSection}</h2>
-          <button className="close-btn" onClick={handleClosePanel} aria-label="Close panel">
+      <FormPanel
+        isOpen={isFormOpen}
+        type={formType}
+        item={editingItem}
+        onClose={closeForm}
+        onSave={saveItem}
+      />
+
+      {/* Footer */}
+      <footer className="footer">
+        <div className="container">
+          <p>&copy; 2025 Chef Virtu's Kitchen Database. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+// FormPanel Component
+interface FormPanelProps {
+  isOpen: boolean;
+  type: string;
+  item: Item | null;
+  onClose: () => void;
+  onSave: (formData: FormData) => void;
+}
+
+function FormPanel({ isOpen, type, item, onClose, onSave }: FormPanelProps) {
+  const [formData, setFormData] = useState<FormData>(item || {});
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <>
+      {/* Overlay */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: isOpen ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0)',
+          transition: 'background 0.3s ease',
+          pointerEvents: isOpen ? 'auto' : 'none',
+          zIndex: 999,
+        }}
+        onClick={onClose}
+      />
+
+      {/* Slide-in Panel */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          right: 0,
+          height: '100vh',
+          width: '100%',
+          maxWidth: '500px',
+          background: 'white',
+          boxShadow: '-2px 0 8px rgba(0, 0, 0, 0.1)',
+          transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
+          transition: 'transform 0.3s ease',
+          zIndex: 1000,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Panel Header */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '24px',
+            background: '#f9f9f9',
+            borderBottom: '1px solid #e0e0e0',
+            flexShrink: 0,
+          }}
+        >
+          <h2 style={{ margin: 0, fontSize: '1.5rem', color: '#2C3E50', fontWeight: 600 }}>
+            {item ? 'Edit' : 'Add'} {type}
+          </h2>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '2rem',
+              color: '#999',
+              cursor: 'pointer',
+              padding: 0,
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s',
+            }}
+          >
             ✕
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="panel-form">
-          <div className="form-group">
-            <label>Title *</label>
+
+        {/* Panel Form */}
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            padding: '24px',
+            overflowY: 'auto',
+            flex: 1,
+          }}
+        >
+          <div>
+            <label style={{ display: 'block', marginBottom: '6px', color: '#333', fontWeight: 500 }}>
+              Title *
+            </label>
             <input
               type="text"
               name="title"
-              placeholder="Enter title"
               value={formData.title || ''}
-              onChange={handleInputChange}
+              onChange={handleChange}
               required
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontFamily: 'inherit',
+                background: 'white',
+                color: '#333',
+              }}
             />
           </div>
 
-          {renderFormFields()}
+          <div>
+            <label style={{ display: 'block', marginBottom: '6px', color: '#333', fontWeight: 500 }}>
+              Category
+            </label>
+            <input
+              type="text"
+              name="category"
+              value={formData.category || formData.cuisine || ''}
+              onChange={handleChange}
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontFamily: 'inherit',
+                background: 'white',
+                color: '#333',
+              }}
+            />
+          </div>
 
-          <div className="form-actions">
-            <button type="submit" className="btn-primary">
-              Add {activeSection?.slice(0, -1)}
+          <div>
+            <label style={{ display: 'block', marginBottom: '6px', color: '#333', fontWeight: 500 }}>
+              Description
+            </label>
+            <textarea
+              name="description"
+              value={formData.description || ''}
+              onChange={handleChange}
+              rows={4}
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontFamily: 'inherit',
+                background: 'white',
+                color: '#333',
+                resize: 'vertical',
+              }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', marginBottom: '6px', color: '#333', fontWeight: 500 }}>
+              Content / Steps
+            </label>
+            <textarea
+              name="content"
+              value={formData.content || formData.steps || ''}
+              onChange={handleChange}
+              rows={6}
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontFamily: 'inherit',
+                background: 'white',
+                color: '#333',
+                resize: 'vertical',
+              }}
+            />
+          </div>
+
+          {/* Panel Actions */}
+          <div
+            style={{
+              display: 'flex',
+              gap: '12px',
+              justifyContent: 'flex-end',
+              marginTop: '24px',
+              paddingTop: '24px',
+              background: '#f9f9f9',
+              borderTop: '1px solid #e0e0e0',
+              marginLeft: '-24px',
+              marginRight: '-24px',
+              marginBottom: '-24px',
+              padding: '24px',
+            }}
+          >
+            <button
+              type="submit"
+              className="btn btn-primary"
+              style={{
+                padding: '10px 24px',
+              }}
+            >
+              Save
             </button>
-            <button type="button" className="btn-secondary" onClick={handleClosePanel}>
+            <button
+              type="button"
+              className="btn"
+              style={{
+                padding: '10px 24px',
+                backgroundColor: '#999',
+                color: 'white',
+              }}
+              onClick={onClose}
+            >
               Cancel
             </button>
           </div>
         </form>
       </div>
-
-      {/* MAIN CONTENT */}
-      <div className="main-content">
-        {/* Recipes Section */}
-        <section className="section recipes-section">
-          <div className="section-header">
-            <h2>📖 Recipes</h2>
-            <button className="btn-add" onClick={() => handleAddClick('Recipes')}>
-              + Add Recipe
-            </button>
-          </div>
-          <div className="items-grid">
-            {recipes.length === 0 ? (
-              <p className="empty-state">No recipes yet. Add one to get started!</p>
-            ) : (
-              recipes.map((recipe) => (
-                <div key={recipe.id} className="item-card">
-                  <h3>{recipe.title}</h3>
-                  <p><strong>Cuisine:</strong> {recipe.cuisine}</p>
-                  <p><strong>Difficulty:</strong> {recipe.difficulty}</p>
-                  <p><strong>Servings:</strong> {recipe.servings}</p>
-                </div>
-              ))
-            )}
-          </div>
-        </section>
-
-        {/* SOPs Section */}
-        <section className="section sops-section">
-          <div className="section-header">
-            <h2>⚙️ SOPs</h2>
-            <button className="btn-add" onClick={() => handleAddClick('SOPs')}>
-              + Add SOP
-            </button>
-          </div>
-          <div className="items-grid">
-            {sops.length === 0 ? (
-              <p className="empty-state">No SOPs yet. Add one to get started!</p>
-            ) : (
-              sops.map((sop) => (
-                <div key={sop.id} className="item-card">
-                  <h3>{sop.title}</h3>
-                  <p><strong>Category:</strong> {sop.category}</p>
-                  <p><strong>Priority:</strong> {sop.priority}</p>
-                </div>
-              ))
-            )}
-          </div>
-        </section>
-
-        {/* Techniques Section */}
-        <section className="section techniques-section">
-          <div className="section-header">
-            <h2>🎯 Techniques</h2>
-            <button className="btn-add" onClick={() => handleAddClick('Techniques')}>
-              + Add Technique
-            </button>
-          </div>
-          <div className="items-grid">
-            {techniques.length === 0 ? (
-              <p className="empty-state">No techniques yet. Add one to get started!</p>
-            ) : (
-              techniques.map((technique) => (
-                <div key={technique.id} className="item-card">
-                  <h3>{technique.title}</h3>
-                  <p>{technique.description}</p>
-                </div>
-              ))
-            )}
-          </div>
-        </section>
-
-        {/* Notes Section */}
-        <section className="section notes-section">
-          <div className="section-header">
-            <h2>📝 Notes</h2>
-            <button className="btn-add" onClick={() => handleAddClick('Notes')}>
-              + Add Note
-            </button>
-          </div>
-          <div className="items-grid">
-            {notes.length === 0 ? (
-              <p className="empty-state">No notes yet. Add one to get started!</p>
-            ) : (
-              notes.map((note) => (
-                <div key={note.id} className="item-card">
-                  <h3>{note.title}</h3>
-                  <p><strong>Category:</strong> {note.category}</p>
-                </div>
-              ))
-            )}
-          </div>
-        </section>
-
-        {/* Resources Section */}
-        <section className="section resources-section">
-          <div className="section-header">
-            <h2>🔗 Resources</h2>
-            <button className="btn-add" onClick={() => handleAddClick('Resources')}>
-              + Add Resource
-            </button>
-          </div>
-          <div className="items-grid">
-            {resources.length === 0 ? (
-              <p className="empty-state">No resources yet. Add one to get started!</p>
-            ) : (
-              resources.map((resource) => (
-                <div key={resource.id} className="item-card">
-                  <h3>{resource.title}</h3>
-                  <p><strong>Type:</strong> {resource.type}</p>
-                </div>
-              ))
-            )}
-          </div>
-        </section>
-
-        {/* Cookbooks Section */}
-        <section className="section cookbooks-section">
-          <div className="section-header">
-            <h2>📚 Cookbooks</h2>
-            <button className="btn-add" onClick={() => handleAddClick('Cookbooks')}>
-              + Add Cookbook
-            </button>
-          </div>
-          <div className="items-grid">
-            {cookbooks.length === 0 ? (
-              <p className="empty-state">No cookbooks yet. Add one to get started!</p>
-            ) : (
-              cookbooks.map((cookbook) => (
-                <div key={cookbook.id} className="item-card">
-                  <h3>{cookbook.title}</h3>
-                  <p><strong>Author:</strong> {cookbook.author}</p>
-                  <p><strong>Cuisine:</strong> {cookbook.cuisine}</p>
-                  <p><strong>Rating:</strong> {'⭐'.repeat(cookbook.rating)}</p>
-                </div>
-              ))
-            )}
-          </div>
-        </section>
-      </div>
-    </main>
+    </>
   );
 }
