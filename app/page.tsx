@@ -11,7 +11,7 @@ interface FormData {
 
 // Color Palette - All Solid
 const colors = {
-  primary: '#0492C2',      // Bright Blue
+  primary: '#A08A61',      // Bright Blue
   accent: '#FAEFDA',       // Cream White
   light: '#F0CF92',        // Light Tan (Background)
   medium: '#BFB195',       // Medium Tan
