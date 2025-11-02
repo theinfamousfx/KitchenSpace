@@ -173,37 +173,36 @@ export default function KitchenDatabase() {
           { section: 'cookbooks', icon: '📚', title: 'Cookbooks' },
         ].map((item) => (
           <div
-            key={item.section}
-            onClick={() => setCurrentView(item.section)}
-            style={{
-              background: 'white',
-              border: '2px solid #E8DCC4',
-              borderRadius: '12px',
-              padding: '24px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              textAlign: 'center',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-8px)';
-              e.currentTarget.style.borderColor = '#B38580';
-              e.currentTarget.style.boxShadow = '0 8px 24px rgba(33, 128, 141, 0.15)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.borderColor = '#E8DCC4';
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
-            }}
-          >
-            <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>{item.icon}</div>
-            <h3 style={{ margin: '0 0 8px 0', color: '#B38580', fontSize: '1.2rem', fontWeight: 600 }}>
-              {item.title}
-            </h3>
-            <p style={{ margin: 0, color: '#999', fontSize: '1.1rem', fontWeight: 500 }}>
-              {data[item.section].length}
-            </p>
-          </div>
+  key={item.section}
+  onClick={() => setCurrentView(item.section)}
+  style={{
+    background: '#B38580',
+    border: 'none',
+    borderRadius: '12px',
+    padding: '24px',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    textAlign: 'center',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.transform = 'translateY(-8px)';
+    e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.transform = 'translateY(0)';
+    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+  }}
+>
+  <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>{item.icon}</div>
+  <h3 style={{ margin: '0 0 8px 0', color: 'white', fontSize: '1.2rem', fontWeight: 600 }}>
+    {item.title}
+  </h3>
+  <p style={{ margin: 0, color: 'rgba(255, 255, 255, 0.9)', fontSize: '1.1rem', fontWeight: 500 }}>
+    {data[item.section].length}
+  </p>
+</div>
+
         ))}
       </div>
     </div>
